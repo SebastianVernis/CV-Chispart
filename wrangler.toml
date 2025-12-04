@@ -1,0 +1,12 @@
+name = "cv-rafael"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+assets = { directory = "./public", binding = "ASSETS" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cv_database"
+database_id = "7fe78f75-e84e-4207-b6dd-399791b6bb48"
+
+[vars]
+BLACKBOX_API_KEY = "sk-mgu31y6sPid25HyDyFFNMg"

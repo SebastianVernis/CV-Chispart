@@ -1,0 +1,29 @@
+{
+  "name": "cv-rafael",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de CV para Rafael Mora Melo",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create cv_database",
+    "db:init": "wrangler d1 execute cv_database --file=./init_database.sql --remote",
+    "db:migrate": "wrangler d1 execute cv_database --file=./migration.sql --remote",
+    "db:migrate-email-image": "wrangler d1 execute cv_database --file=./migration_email_image.sql --remote",
+    "db:seed": "wrangler d1 execute cv_database --file=./seed_rafael_cv.sql --remote",
+    "db:query": "wrangler d1 execute cv_database --command"
+  },
+  "keywords": [
+    "cv",
+    "cloudflare",
+    "workers"
+  ],
+  "author": "Rafael Mora Melo",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "@cloudflare/kv-asset-handler": "^0.4.1"
+  }
+}

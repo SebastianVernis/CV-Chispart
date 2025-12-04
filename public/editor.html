@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor de CV - Rafael Mora Melo</title>
+  <style>
+    :root {
+      --color-cream-50: rgba(252, 252, 249, 1);
+      --color-teal-500: rgba(33, 128, 141, 1);
+      --color-teal-600: rgba(29, 116, 128, 1);
+      --color-slate-900: rgba(19, 52, 59, 1);
+      --color-slate-500: rgba(98, 108, 113, 1);
+      --color-red-500: rgba(192, 21, 47, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header h1 {
+      color: var(--color-slate-900);
+      font-size: 24px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--color-teal-500);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-teal-600);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-slate-900);
+      border: 1px solid #ddd;
+    }
+
+    .btn-secondary:hover {
+      background: #f9f9f9;
+    }
+
+    .btn-danger {
+      background: var(--color-red-500);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b01838;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      height: fit-content;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: var(--color-slate-900);
+    }
+
+    .cv-list {
+      list-style: none;
+    }
+
+    .cv-item {
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .cv-item:hover {
+      background: #f9f9f9;
+    }
+
+    .cv-item.active {
+      background: rgba(33, 128, 141, 0.1);
+      border-color: var(--color-teal-500);
+    }
+
+    .cv-item-name {
+      font-size: 14px;
+      color: var(--color-slate-900);
+      flex: 1;
+    }
+
+    .cv-item-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .cv-item-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+
+    .cv-item-delete {
+      color: var(--color-red-500);
+    }
+
+    .cv-item-delete:hover {
+      background: rgba(192, 21, 47, 0.1);
+    }
+
+    .cv-item-link {
+      color: var(--color-teal-500);
+    }
+
+    .cv-item-link:hover {
+      background: rgba(33, 128, 141, 0.1);
+    }
+
+    .cv-item-public {
+      color: var(--color-slate-500);
+    }
+
+    .cv-item-public:hover {
+      background: rgba(98, 108, 113, 0.1);
+    }
+
+    .cv-item-public.active {
+      color: var(--color-teal-500);
+      font-weight: 600;
+    }
+
+    .editor-section {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-slate-900);
+      margin-bottom: 8px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--color-teal-500);
+      box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
+    }
+
+    .section-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-slate-900);
+      margin: 30px 0 15px 0;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .experience-item, .skill-group {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #eee;
+    }
+
+    .add-item-btn {
+      margin-top: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: var(--color-slate-900);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .link-modal .modal-content {
+      max-width: 500px;
+    }
+
+    .link-display {
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      margin: 15px 0;
+    }
+
+    .copy-feedback {
+      color: var(--color-teal-500);
+      font-size: 13px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .copy-feedback.show {
+      display: block;
+    }
+
+    .public-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .public-toggle input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .public-toggle label {
+      cursor: pointer;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Editor de CV</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="askAI()">🤖 Asistente IA</button>
+      <button class="btn btn-secondary" onclick="previewCV()">Vista Previa</button>
+      <button class="btn btn-primary" onclick="saveCV()">Guardar CV</button>
+      <button class="btn btn-secondary" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Mis CVs</h2>
+      <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="showNewCVModal()">+ Nuevo CV</button>
+      <ul class="cv-list" id="cvList"></ul>
+    </aside>
+
+    <main class="editor-section">
+      <h2 class="section-header">Información Personal</h2>
+      
+      <div class="form-group">
+        <label for="profileImage">Foto de Perfil (opcional)</label>
+        <input type="file" id="profileImage" accept="image/*" onchange="handleImageUpload(event)" />
+        <div id="imagePreview" style="margin-top: 10px; display: none;">
+          <img id="previewImg" style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;" />
+          <button class="btn btn-secondary" style="margin-top: 8px; padding: 6px 12px; font-size: 12px;" onclick="removeImage()">× Quitar imagen</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Nombre Completo</label>
+          <input type="text" id="name" value="" />
+        </div>
+        <div class="form-group">
+          <label for="role">Rol/Título Profesional</label>
+          <input type="text" id="role" value="" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="location">Ubicación</label>
+          <input type="text" id="location" value="" />
+        </div>
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input type="text" id="phone" value="" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" value="" />
+        </div>
+        <div class="form-group">
+          <label for="linkedin">LinkedIn</label>
+          <input type="text" id="linkedin" value="" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label for="summary" style="margin: 0;">Perfil Profesional</label>
+          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="optimizeField('summary')">🤖 Optimizar</button>
+        </div>
+        <textarea id="summary"></textarea>
+      </div>
+
+      <h2 class="section-header">Enfoque del CV</h2>
+      <div class="form-group">
+        <label for="cvFocus">Sector/Industria Objetivo</label>
+        <select id="cvFocus">
+          <option value="general">General</option>
+          <option value="ong">ONG / Tercer Sector</option>
+          <option value="corporativo">Corporativo</option>
+          <option value="tecnologia">Tecnología</option>
+          <option value="educacion">Educación</option>
+          <option value="gobierno">Gobierno</option>
+        </select>
+      </div>
+
+      <h2 class="section-header">Experiencia Profesional</h2>
+      <div id="experienceContainer">
+        <!-- Experiencias se cargarán dinámicamente -->
+      </div>
+      <button class="btn btn-secondary add-item-btn" onclick="addExperience()">+ Agregar Experiencia</button>
+
+      <h2 class="section-header">Educación</h2>
+      <div id="educationContainer">
+        <!-- Educación se cargará dinámicamente -->
+      </div>
+      <button class="btn btn-secondary add-item-btn" onclick="addEducation()">+ Agregar Educación</button>
+
+      <h2 class="section-header">Competencias Clave</h2>
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label for="skills" style="margin: 0;">Habilidades (separadas por comas)</label>
+          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="optimizeField('skills')">🤖 Optimizar</button>
+        </div>
+        <textarea id="skills"></textarea>
+      </div>
+
+      <h2 class="section-header">Herramientas</h2>
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label for="tools" style="margin: 0;">Herramientas (separadas por comas)</label>
+          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="optimizeField('tools')">🤖 Optimizar</button>
+        </div>
+        <textarea id="tools"></textarea>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para nuevo CV -->
+  <div class="modal" id="newCVModal">
+    <div class="modal-content">
+      <h2>Crear Nuevo CV</h2>
+      <div class="form-group">
+        <label for="newCVName">Nombre del CV</label>
+        <input type="text" id="newCVName" placeholder="Ej: CV_ONG_2024" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeNewCVModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="createNewCV()">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Asistente IA por campo -->
+  <div class="modal" id="aiFieldModal">
+    <div class="modal-content" style="max-width: 600px;">
+      <h2 id="aiFieldModalTitle">🤖 Optimizar Campo</h2>
+      
+      <div style="padding: 12px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd; margin-bottom: 15px;">
+        <p style="margin: 0; font-size: 13px; color: #0c4a6e;"><strong>Contenido actual:</strong></p>
+        <p id="aiFieldCurrentValue" style="margin: 8px 0 0 0; font-size: 12px; color: #075985; max-height: 80px; overflow-y: auto;"></p>
+      </div>
+
+      <div id="aiFieldResponse" style="display: none; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-size: 14px; margin: 0; color: var(--color-slate-900);">✨ Sugerencia optimizada:</h3>
+          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="copyFieldSuggestion()">📋 Copiar</button>
+        </div>
+        <div id="aiFieldResponseText" style="font-size: 13px; line-height: 1.6; color: var(--color-slate-500); white-space: pre-wrap; max-height: 300px; overflow-y: auto; padding: 10px; background: white; border-radius: 6px;"></div>
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+          <button class="btn btn-secondary" style="flex: 1;" onclick="closeFieldAIModal()">Cancelar</button>
+          <button class="btn btn-primary" style="flex: 1;" onclick="applyFieldSuggestion()">✅ Aplicar</button>
+        </div>
+      </div>
+      
+      <div id="aiFieldLoading" style="display: none; text-align: center; padding: 40px 20px; color: var(--color-teal-500);">
+        <p style="margin: 0; font-size: 14px;">⏳ Optimizando contenido...</p>
+        <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--color-slate-500);">Esto puede tomar unos segundos</p>
+      </div>
+      
+      <div class="modal-actions" id="aiFieldInitialActions">
+        <button class="btn btn-secondary" onclick="closeFieldAIModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitFieldOptimization()" id="aiFieldSubmitBtn">🚀 Optimizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Asistente IA general -->
+  <div class="modal" id="aiModal">
+    <div class="modal-content" style="max-width: 600px;">
+      <h2>🤖 Asistente IA - Consulta General</h2>
+      
+      <div class="form-group">
+        <label for="aiPrompt">¿Cómo puedo ayudarte?</label>
+        <textarea id="aiPrompt" placeholder="Ej: Dame consejos para adaptar mi CV al sector de ONGs" style="min-height: 100px;"></textarea>
+      </div>
+
+      <div id="aiResponse" style="display: none; margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-size: 14px; margin: 0; color: var(--color-slate-900);">Respuesta:</h3>
+          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="copyAISuggestion()">📋 Copiar</button>
+        </div>
+        <div id="aiResponseText" style="font-size: 13px; line-height: 1.6; color: var(--color-slate-500); white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></div>
+      </div>
+      
+      <div id="aiLoading" style="display: none; text-align: center; margin-top: 20px; color: var(--color-teal-500);">
+        <p>⏳ Procesando tu solicitud...</p>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeAIModal()">Cerrar</button>
+        <button class="btn btn-primary" onclick="submitAIRequest()" id="aiSubmitBtn">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para link público -->
+  <div class="modal link-modal" id="linkModal">
+    <div class="modal-content">
+      <h2>Link Público del CV</h2>
+      
+      <div class="public-toggle">
+        <input type="checkbox" id="publicToggle" onchange="togglePublic()" />
+        <label for="publicToggle">Hacer público este CV</label>
+      </div>
+      
+      <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+        Al hacer público el CV, cualquiera con el link podrá verlo.
+      </p>
+      
+      <div class="link-display" id="linkDisplay"></div>
+      
+      <button class="btn btn-primary" style="width: 100%;" onclick="copyLink()">Copiar Link</button>
+      <p class="copy-feedback" id="copyFeedback">✓ Link copiado al portapapeles</p>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeLinkModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    if (!sessionStorage.getItem('authenticated')) {
+      window.location.href = 'login.html';
+    }
+
+    const authToken = sessionStorage.getItem('authToken');
+    let cvs = [];
+    let currentCVId = null;
+
+    // Load CVs from server
+    async function loadCVsFromServer() {
+      try {
+        const response = await fetch('/api/cvs', {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          cvs = data.map(cv => ({
+            id: cv.id,
+            name: cv.name,
+            slug: cv.slug,
+            is_public: cv.is_public,
+            data: JSON.parse(cv.data)
+          }));
+
+          if (cvs.length === 0) {
+            await createDefaultCV();
+          } else {
+            currentCVId = cvs[0].id;
+            loadFormData(cvs[0].data);
+          }
+          renderCVList();
+        } else if (response.status === 401) {
+          sessionStorage.removeItem('authenticated');
+          sessionStorage.removeItem('authToken');
+          window.location.href = 'login.html';
+        }
+      } catch (error) {
+        console.error('Error loading CVs:', error);
+        // Fallback to localStorage
+        cvs = JSON.parse(localStorage.getItem('cvs')) || [];
+        currentCVId = localStorage.getItem('currentCVId') || null;
+        
+        if (cvs.length === 0) {
+          await createDefaultCV();
+        }
+        renderCVList();
+      }
+    }
+
+    async function createDefaultCV() {
+      const defaultCV = {
+        id: 'cv_' + Date.now(),
+        name: 'Mi Primer CV',
+        data: {
+          name: '',
+          role: '',
+          location: '',
+          phone: '',
+          email: '',
+          linkedin: '',
+          summary: '',
+          cvFocus: 'general',
+          profileImage: null,
+          education: [
+            {
+              degree: '',
+              institution: '',
+              dates: ''
+            }
+          ],
+          experiences: [
+            {
+              role: '',
+              company: '',
+              dates: '',
+              responsibilities: ''
+            }
+          ],
+          skills: '',
+          tools: ''
+        }
+      };
+      
+      try {
+        await fetch('/api/cvs', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(defaultCV),
+        });
+        cvs.push(defaultCV);
+        currentCVId = defaultCV.id;
+      } catch (error) {
+        console.error('Error creating default CV:', error);
+        cvs.push(defaultCV);
+        currentCVId = defaultCV.id;
+        localStorage.setItem('cvs', JSON.stringify(cvs));
+        localStorage.setItem('currentCVId', currentCVId);
+      }
+    }
+
+    let currentProfileImage = null;
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert('La imagen no debe superar los 2MB');
+        event.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentProfileImage = e.target.result;
+        document.getElementById('previewImg').src = currentProfileImage;
+        document.getElementById('imagePreview').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeImage() {
+      currentProfileImage = null;
+      document.getElementById('profileImage').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+    }
+
+    function collectFormData() {
+      const experiences = [];
+      document.querySelectorAll('#experienceContainer .experience-item').forEach(item => {
+        experiences.push({
+          role: item.querySelector('.exp-role').value,
+          company: item.querySelector('.exp-company').value,
+          dates: item.querySelector('.exp-dates').value,
+          responsibilities: item.querySelector('.exp-responsibilities').value
+        });
+      });
+
+      const education = [];
+      document.querySelectorAll('#educationContainer .experience-item').forEach(item => {
+        education.push({
+          degree: item.querySelector('.edu-degree').value,
+          institution: item.querySelector('.edu-institution').value,
+          dates: item.querySelector('.edu-dates').value
+        });
+      });
+
+      return {
+        name: document.getElementById('name').value,
+        role: document.getElementById('role').value,
+        location: document.getElementById('location').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        linkedin: document.getElementById('linkedin').value,
+        summary: document.getElementById('summary').value,
+        cvFocus: document.getElementById('cvFocus').value,
+        profileImage: currentProfileImage,
+        experiences: experiences,
+        education: education,
+        skills: document.getElementById('skills').value,
+        tools: document.getElementById('tools').value
+      };
+    }
+
+    function loadFormData(data) {
+      document.getElementById('name').value = data.name || '';
+      document.getElementById('role').value = data.role || '';
+      document.getElementById('location').value = data.location || '';
+      document.getElementById('phone').value = data.phone || '';
+      document.getElementById('email').value = data.email || '';
+      document.getElementById('linkedin').value = data.linkedin || '';
+      document.getElementById('summary').value = data.summary || '';
+      document.getElementById('cvFocus').value = data.cvFocus || 'general';
+      document.getElementById('skills').value = data.skills || '';
+      document.getElementById('tools').value = data.tools || '';
+
+      // Load profile image
+      if (data.profileImage) {
+        currentProfileImage = data.profileImage;
+        document.getElementById('previewImg').src = currentProfileImage;
+        document.getElementById('imagePreview').style.display = 'block';
+      } else {
+        currentProfileImage = null;
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('profileImage').value = '';
+      }
+
+      const container = document.getElementById('experienceContainer');
+      container.innerHTML = '';
+      
+      if (data.experiences && data.experiences.length > 0) {
+        data.experiences.forEach((exp, index) => {
+          const div = document.createElement('div');
+          div.className = 'experience-item';
+          div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h3 style="margin: 0; font-size: 16px; color: var(--color-slate-900);">Experiencia ${index + 1}</h3>
+              <button class="btn btn-danger" style="padding: 4px 12px; font-size: 12px;" onclick="removeExperience(this)">× Eliminar</button>
+            </div>
+            <div class="form-group">
+              <label>Cargo</label>
+              <input type="text" class="exp-role" value="${exp.role || ''}" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Empresa</label>
+                <input type="text" class="exp-company" value="${exp.company || ''}" />
+              </div>
+              <div class="form-group">
+                <label>Período</label>
+                <input type="text" class="exp-dates" value="${exp.dates || ''}" />
+              </div>
+            </div>
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="margin: 0;">Responsabilidades (una por línea)</label>
+                <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="optimizeResponsibilities(this)">🤖 Optimizar</button>
+              </div>
+              <textarea class="exp-responsibilities">${exp.responsibilities || ''}</textarea>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      // Load education
+      const eduContainer = document.getElementById('educationContainer');
+      
+      if (data.education && data.education.length > 0) {
+        eduContainer.innerHTML = '';
+        data.education.forEach((edu, index) => {
+          const div = document.createElement('div');
+          div.className = 'experience-item';
+          div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h3 style="margin: 0; font-size: 16px; color: var(--color-slate-900);">Educación ${index + 1}</h3>
+              <button class="btn btn-danger" style="padding: 4px 12px; font-size: 12px;" onclick="removeEducation(this)">× Eliminar</button>
+            </div>
+            <div class="form-group">
+              <label>Título/Grado</label>
+              <input type="text" class="edu-degree" value="${edu.degree || ''}" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Institución</label>
+                <input type="text" class="edu-institution" value="${edu.institution || ''}" />
+              </div>
+              <div class="form-group">
+                <label>Período</label>
+                <input type="text" class="edu-dates" value="${edu.dates || ''}" />
+              </div>
+            </div>
+          `;
+          eduContainer.appendChild(div);
+        });
+      }
+      // Si no hay educación en los datos, mantener la predeterminada del HTML
+    }
+
+    function renderCVList() {
+      const list = document.getElementById('cvList');
+      list.innerHTML = '';
+      
+      cvs.forEach(cv => {
+        const li = document.createElement('li');
+        li.className = 'cv-item' + (cv.id === currentCVId ? ' active' : '');
+        const isPublic = cv.is_public === 1 || cv.is_public === true;
+        li.innerHTML = `
+          <span class="cv-item-name">${cv.name}</span>
+          <div class="cv-item-actions">
+            <button class="cv-item-btn cv-item-public ${isPublic ? 'active' : ''}" onclick="showLinkModal('${cv.id}', event)" title="${isPublic ? 'CV público' : 'Hacer público'}">🔗</button>
+            <button class="cv-item-btn cv-item-delete" onclick="deleteCV('${cv.id}', event)" title="Eliminar">×</button>
+          </div>
+        `;
+        li.onclick = (e) => {
+          if (!e.target.classList.contains('cv-item-btn')) {
+            loadCV(cv.id);
+          }
+        };
+        list.appendChild(li);
+      });
+    }
+
+    function loadCV(cvId) {
+      const cv = cvs.find(c => c.id === cvId);
+      if (cv) {
+        currentCVId = cvId;
+        loadFormData(cv.data);
+        renderCVList();
+      }
+    }
+
+    async function saveCV() {
+      const cv = cvs.find(c => c.id === currentCVId);
+      if (cv) {
+        cv.data = collectFormData();
+        
+        try {
+          const response = await fetch(`/api/cvs/${cv.id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: cv.name, data: cv.data, is_public: cv.is_public || 0 }),
+          });
+
+          if (response.ok) {
+            alert('CV guardado exitosamente');
+          } else {
+            throw new Error('Error al guardar');
+          }
+        } catch (error) {
+          console.error('Error saving CV:', error);
+          localStorage.setItem('cvs', JSON.stringify(cvs));
+          alert('CV guardado localmente (sin conexión al servidor)');
+        }
+      }
+    }
+
+    function showLinkModal(cvId, event) {
+      event.stopPropagation();
+      
+      const cv = cvs.find(c => c.id === cvId);
+      if (!cv) return;
+      
+      currentCVId = cvId;
+      const isPublic = cv.is_public === 1 || cv.is_public === true;
+      const baseUrl = window.location.origin;
+      const link = `${baseUrl}/cv/${cv.slug}`;
+      
+      document.getElementById('publicToggle').checked = isPublic;
+      document.getElementById('linkDisplay').textContent = link;
+      document.getElementById('linkModal').classList.add('show');
+      document.getElementById('copyFeedback').classList.remove('show');
+    }
+
+    function closeLinkModal() {
+      document.getElementById('linkModal').classList.remove('show');
+    }
+
+    async function togglePublic() {
+      const cv = cvs.find(c => c.id === currentCVId);
+      if (!cv) return;
+      
+      const isPublic = document.getElementById('publicToggle').checked;
+      cv.is_public = isPublic ? 1 : 0;
+      
+      try {
+        const response = await fetch(`/api/cvs/${cv.id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: cv.name, data: cv.data, is_public: cv.is_public }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al actualizar visibilidad');
+        }
+        
+        renderCVList();
+      } catch (error) {
+        console.error('Error toggling public:', error);
+        alert('Error al cambiar la visibilidad del CV');
+        document.getElementById('publicToggle').checked = !isPublic;
+      }
+    }
+
+    function copyLink() {
+      const linkText = document.getElementById('linkDisplay').textContent;
+      navigator.clipboard.writeText(linkText).then(() => {
+        const feedback = document.getElementById('copyFeedback');
+        feedback.classList.add('show');
+        setTimeout(() => {
+          feedback.classList.remove('show');
+        }, 2000);
+      }).catch(err => {
+        console.error('Error al copiar:', err);
+        alert('No se pudo copiar el link');
+      });
+    }
+
+    function showNewCVModal() {
+      document.getElementById('newCVModal').classList.add('show');
+      document.getElementById('newCVName').value = '';
+    }
+
+    function closeNewCVModal() {
+      document.getElementById('newCVModal').classList.remove('show');
+    }
+
+    async function createNewCV() {
+      const name = document.getElementById('newCVName').value.trim();
+      if (!name) {
+        alert('Por favor ingresa un nombre para el CV');
+        return;
+      }
+
+      const newCV = {
+        id: 'cv_' + Date.now(),
+        name: name,
+        data: collectFormData()
+      };
+
+      try {
+        const response = await fetch('/api/cvs', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newCV),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          newCV.slug = result.slug;
+          newCV.is_public = 0;
+          cvs.push(newCV);
+          currentCVId = newCV.id;
+        } else {
+          throw new Error('Error al crear CV');
+        }
+      } catch (error) {
+        console.error('Error creating CV:', error);
+        newCV.slug = 'local_' + Date.now();
+        newCV.is_public = 0;
+        cvs.push(newCV);
+        currentCVId = newCV.id;
+        localStorage.setItem('cvs', JSON.stringify(cvs));
+        localStorage.setItem('currentCVId', currentCVId);
+      }
+      
+      closeNewCVModal();
+      renderCVList();
+      loadFormData(newCV.data);
+    }
+
+    async function deleteCV(cvId, event) {
+      event.stopPropagation();
+      
+      if (cvs.length === 1) {
+        alert('No puedes eliminar el último CV');
+        return;
+      }
+
+      if (confirm('¿Estás seguro de eliminar este CV?')) {
+        try {
+          const response = await fetch(`/api/cvs/${cvId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Error al eliminar CV');
+          }
+        } catch (error) {
+          console.error('Error deleting CV:', error);
+        }
+
+        cvs = cvs.filter(c => c.id !== cvId);
+        
+        if (currentCVId === cvId) {
+          currentCVId = cvs[0].id;
+          loadFormData(cvs[0].data);
+        }
+        
+        localStorage.setItem('cvs', JSON.stringify(cvs));
+        localStorage.setItem('currentCVId', currentCVId);
+        renderCVList();
+      }
+    }
+
+    function previewCV() {
+      saveCV();
+      const cv = cvs.find(c => c.id === currentCVId);
+      if (cv) {
+        localStorage.setItem('previewCV', JSON.stringify(cv.data));
+        window.open('preview.html', '_blank');
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('authenticated');
+      sessionStorage.removeItem('authToken');
+      window.location.href = 'login.html';
+    }
+
+    // AI Assistant functions
+    let lastAIPrompt = '';
+    let lastAISuggestion = '';
+    let aiTargetField = null;
+    let currentOptimizingField = null;
+    let fieldSuggestion = '';
+
+    function askAI() {
+      document.getElementById('aiModal').classList.add('show');
+      document.getElementById('aiPrompt').value = '';
+      document.getElementById('aiResponse').style.display = 'none';
+      document.getElementById('aiLoading').style.display = 'none';
+      lastAIPrompt = '';
+      lastAISuggestion = '';
+    }
+
+    function optimizeField(fieldName) {
+      currentOptimizingField = fieldName;
+      const fieldLabels = {
+        'summary': 'Perfil Profesional',
+        'skills': 'Competencias Clave',
+        'tools': 'Herramientas'
+      };
+      
+      const currentValue = document.getElementById(fieldName).value;
+      
+      document.getElementById('aiFieldModalTitle').textContent = `🤖 Optimizar ${fieldLabels[fieldName]}`;
+      document.getElementById('aiFieldCurrentValue').textContent = currentValue || '(vacío)';
+      document.getElementById('aiFieldResponse').style.display = 'none';
+      document.getElementById('aiFieldLoading').style.display = 'none';
+      document.getElementById('aiFieldInitialActions').style.display = 'flex';
+      
+      document.getElementById('aiFieldModal').classList.add('show');
+    }
+
+    function closeFieldAIModal() {
+      document.getElementById('aiFieldModal').classList.remove('show');
+      currentOptimizingField = null;
+      fieldSuggestion = '';
+    }
+
+    async function submitFieldOptimization() {
+      if (!currentOptimizingField) return;
+      
+      const cvData = collectFormData();
+      const cvFocus = cvData.cvFocus || 'general';
+      
+      // Determinar contexto mínimo según el campo
+      let contextData = {
+        role: cvData.role,
+        cvFocus: cvFocus
+      };
+      
+      let prompt = '';
+      
+      if (currentOptimizingField === 'summary') {
+        // Para summary: incluir role, experiences (títulos y empresas), y focus
+        contextData.experiences = cvData.experiences.map(exp => ({
+          role: exp.role,
+          company: exp.company,
+          dates: exp.dates
+        }));
+        contextData.currentSummary = cvData.summary;
+        
+        prompt = `Optimiza el siguiente perfil profesional para un CV enfocado en el sector "${cvFocus}".
+
+Rol: ${cvData.role}
+Perfil actual: ${cvData.summary}
+
+Experiencia relevante:
+${cvData.experiences.map(exp => `- ${exp.role} en ${exp.company} (${exp.dates})`).join('\n')}
+
+Genera un perfil profesional optimizado, atractivo y conciso (máximo 3-4 líneas). Enfócate en logros y valor agregado. Responde SOLO con el texto optimizado, sin explicaciones adicionales.`;
+        
+      } else if (currentOptimizingField === 'skills') {
+        // Para skills: incluir role, experiences (responsabilidades resumidas), y focus
+        contextData.currentSkills = cvData.skills;
+        contextData.experienceSummary = cvData.experiences.map(exp => exp.role).join(', ');
+        
+        prompt = `Sugiere habilidades profesionales optimizadas para un CV enfocado en el sector "${cvFocus}".
+
+Rol: ${cvData.role}
+Experiencia: ${cvData.experiences.map(exp => exp.role).join(', ')}
+Habilidades actuales: ${cvData.skills}
+
+Genera una lista mejorada de habilidades profesionales clave. Responde SOLO con las habilidades separadas por comas, sin explicaciones adicionales.`;
+        
+      } else if (currentOptimizingField === 'tools') {
+        // Para tools: incluir role y focus
+        contextData.currentTools = cvData.tools;
+        
+        prompt = `Sugiere herramientas y software optimizadas para un CV enfocado en el sector "${cvFocus}".
+
+Rol: ${cvData.role}
+Herramientas actuales: ${cvData.tools}
+
+Genera una lista mejorada y actualizada de herramientas/software relevantes. Responde SOLO con las herramientas separadas por comas, sin explicaciones adicionales.`;
+      }
+      
+      const loading = document.getElementById('aiFieldLoading');
+      const response = document.getElementById('aiFieldResponse');
+      const submitBtn = document.getElementById('aiFieldSubmitBtn');
+      const initialActions = document.getElementById('aiFieldInitialActions');
+
+      loading.style.display = 'block';
+      response.style.display = 'none';
+      initialActions.style.display = 'none';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/ai/optimize', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt, cvData: contextData }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          fieldSuggestion = data.suggestion.trim();
+          document.getElementById('aiFieldResponseText').textContent = fieldSuggestion;
+          response.style.display = 'block';
+        } else {
+          alert('Error: ' + (data.error || 'No se pudo procesar la solicitud'));
+          initialActions.style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('Error calling AI:', error);
+        alert('Error al conectar con el asistente IA');
+        initialActions.style.display = 'flex';
+      } finally {
+        loading.style.display = 'none';
+        submitBtn.disabled = false;
+      }
+    }
+
+    function copyFieldSuggestion() {
+      navigator.clipboard.writeText(fieldSuggestion).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '✅ Copiado';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      }).catch(err => {
+        console.error('Error al copiar:', err);
+        alert('No se pudo copiar la sugerencia');
+      });
+    }
+
+    function applyFieldSuggestion() {
+      if (!currentOptimizingField || !fieldSuggestion) return;
+      
+      document.getElementById(currentOptimizingField).value = fieldSuggestion;
+      closeFieldAIModal();
+      
+      // Pequeña animación visual
+      const field = document.getElementById(currentOptimizingField);
+      field.style.background = '#d1fae5';
+      setTimeout(() => {
+        field.style.background = '';
+      }, 1000);
+      
+      alert('✅ Campo actualizado. No olvides guardar los cambios.');
+    }
+
+    // Optimize responsibilities for specific experience
+    let currentResponsibilitiesTextarea = null;
+
+    function optimizeResponsibilities(button) {
+      const expItem = button.closest('.experience-item');
+      const textarea = expItem.querySelector('.exp-responsibilities');
+      const role = expItem.querySelector('.exp-role').value;
+      const company = expItem.querySelector('.exp-company').value;
+      const currentValue = textarea.value;
+      
+      currentResponsibilitiesTextarea = textarea;
+      
+      const title = role && company ? `${role} en ${company}` : 'esta experiencia';
+      
+      document.getElementById('aiFieldModalTitle').textContent = `🤖 Optimizar Responsabilidades`;
+      document.getElementById('aiFieldCurrentValue').textContent = currentValue || '(vacío)';
+      document.getElementById('aiFieldResponse').style.display = 'none';
+      document.getElementById('aiFieldLoading').style.display = 'none';
+      document.getElementById('aiFieldInitialActions').style.display = 'flex';
+      
+      // Store context for optimization
+      window.currentExpContext = { role, company, responsibilities: currentValue };
+      
+      document.getElementById('aiFieldModal').classList.add('show');
+      
+      // Override submit function temporarily
+      const originalSubmit = window.submitFieldOptimization;
+      window.submitFieldOptimization = async function() {
+        if (!currentResponsibilitiesTextarea) return;
+        
+        const cvData = collectFormData();
+        const cvFocus = cvData.cvFocus || 'general';
+        
+        // Contexto mínimo: solo el cargo, empresa y focus
+        const contextData = {
+          role: window.currentExpContext.role,
+          company: window.currentExpContext.company,
+          cvFocus: cvFocus
+        };
+        
+        const prompt = `Optimiza las responsabilidades para el puesto de "${window.currentExpContext.role || 'este puesto'}" en "${window.currentExpContext.company || 'esta empresa'}" para un CV enfocado en el sector "${cvFocus}".
+
+Responsabilidades actuales:
+${window.currentExpContext.responsibilities}
+
+Genera una versión mejorada, más profesional y enfocada en logros. Usa viñetas/puntos separados por saltos de línea. Responde SOLO con las responsabilidades optimizadas, sin explicaciones adicionales.`;
+        
+        const loading = document.getElementById('aiFieldLoading');
+        const response = document.getElementById('aiFieldResponse');
+        const submitBtn = document.getElementById('aiFieldSubmitBtn');
+        const initialActions = document.getElementById('aiFieldInitialActions');
+
+        loading.style.display = 'block';
+        response.style.display = 'none';
+        initialActions.style.display = 'none';
+        submitBtn.disabled = true;
+
+        try {
+          const res = await fetch('/api/ai/optimize', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt, cvData: contextData }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            fieldSuggestion = data.suggestion.trim();
+            document.getElementById('aiFieldResponseText').textContent = fieldSuggestion;
+            response.style.display = 'block';
+          } else {
+            alert('Error: ' + (data.error || 'No se pudo procesar la solicitud'));
+            initialActions.style.display = 'flex';
+          }
+        } catch (error) {
+          console.error('Error calling AI:', error);
+          alert('Error al conectar con el asistente IA');
+          initialActions.style.display = 'flex';
+        } finally {
+          loading.style.display = 'none';
+          submitBtn.disabled = false;
+        }
+      };
+      
+      // Override apply function temporarily
+      const originalApply = window.applyFieldSuggestion;
+      window.applyFieldSuggestion = function() {
+        if (!currentResponsibilitiesTextarea || !fieldSuggestion) return;
+        
+        currentResponsibilitiesTextarea.value = fieldSuggestion;
+        closeFieldAIModal();
+        
+        // Pequeña animación visual
+        currentResponsibilitiesTextarea.style.background = '#d1fae5';
+        setTimeout(() => {
+          currentResponsibilitiesTextarea.style.background = '';
+        }, 1000);
+        
+        alert('✅ Responsabilidades actualizadas. No olvides guardar los cambios.');
+        
+        // Restore original functions
+        window.submitFieldOptimization = originalSubmit;
+        window.applyFieldSuggestion = originalApply;
+        currentResponsibilitiesTextarea = null;
+      };
+    }
+
+    function closeAIModal() {
+      document.getElementById('aiModal').classList.remove('show');
+    }
+
+    function setAIPrompt(prompt) {
+      document.getElementById('aiPrompt').value = prompt;
+    }
+
+    async function submitAIRequest() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      if (!prompt) {
+        alert('Por favor ingresa una solicitud');
+        return;
+      }
+
+      lastAIPrompt = prompt;
+      
+      const cvData = collectFormData();
+      const loading = document.getElementById('aiLoading');
+      const response = document.getElementById('aiResponse');
+      const submitBtn = document.getElementById('aiSubmitBtn');
+
+      loading.style.display = 'block';
+      response.style.display = 'none';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/ai/optimize', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt, cvData }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          lastAISuggestion = data.suggestion;
+          document.getElementById('aiResponseText').textContent = data.suggestion;
+          response.style.display = 'block';
+        } else {
+          alert('Error: ' + (data.error || 'No se pudo procesar la solicitud'));
+        }
+      } catch (error) {
+        console.error('Error calling AI:', error);
+        alert('Error al conectar con el asistente IA');
+      } finally {
+        loading.style.display = 'none';
+        submitBtn.disabled = false;
+      }
+    }
+
+
+
+    function copyAISuggestion() {
+      navigator.clipboard.writeText(lastAISuggestion).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '✅ Copiado';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      }).catch(err => {
+        console.error('Error al copiar:', err);
+        alert('No se pudo copiar la sugerencia');
+      });
+    }
+
+    // Education management
+    function addEducation() {
+      const container = document.getElementById('educationContainer');
+      const newEdu = document.createElement('div');
+      newEdu.className = 'experience-item';
+      newEdu.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="margin: 0; font-size: 16px; color: var(--color-slate-900);">Nueva Educación</h3>
+          <button class="btn btn-danger" style="padding: 4px 12px; font-size: 12px;" onclick="removeEducation(this)">× Eliminar</button>
+        </div>
+        <div class="form-group">
+          <label>Título/Grado</label>
+          <input type="text" class="edu-degree" value="" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Institución</label>
+            <input type="text" class="edu-institution" value="" />
+          </div>
+          <div class="form-group">
+            <label>Período</label>
+            <input type="text" class="edu-dates" value="" />
+          </div>
+        </div>
+      `;
+      container.appendChild(newEdu);
+    }
+
+    function removeEducation(button) {
+      const eduItem = button.closest('.experience-item');
+      const container = document.getElementById('educationContainer');
+      
+      // No permitir eliminar si solo hay una educación
+      if (container.querySelectorAll('.experience-item').length <= 1) {
+        alert('Debe haber al menos una educación');
+        return;
+      }
+      
+      if (confirm('¿Eliminar esta educación?')) {
+        eduItem.remove();
+      }
+    }
+
+    // Experience management
+    function addExperience() {
+      const container = document.getElementById('experienceContainer');
+      const newExp = document.createElement('div');
+      newExp.className = 'experience-item';
+      newExp.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="margin: 0; font-size: 16px; color: var(--color-slate-900);">Nueva Experiencia</h3>
+          <button class="btn btn-danger" style="padding: 4px 12px; font-size: 12px;" onclick="removeExperience(this)">× Eliminar</button>
+        </div>
+        <div class="form-group">
+          <label>Cargo</label>
+          <input type="text" class="exp-role" value="" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Empresa</label>
+            <input type="text" class="exp-company" value="" />
+          </div>
+          <div class="form-group">
+            <label>Período</label>
+            <input type="text" class="exp-dates" value="" />
+          </div>
+        </div>
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label style="margin: 0;">Responsabilidades (una por línea)</label>
+            <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="optimizeResponsibilities(this)">🤖 Optimizar</button>
+          </div>
+          <textarea class="exp-responsibilities"></textarea>
+        </div>
+      `;
+      container.appendChild(newExp);
+    }
+
+    function removeExperience(button) {
+      const expItem = button.closest('.experience-item');
+      const container = document.getElementById('experienceContainer');
+      
+      // No permitir eliminar si solo hay una experiencia
+      if (container.querySelectorAll('.experience-item').length <= 1) {
+        alert('Debe haber al menos una experiencia profesional');
+        return;
+      }
+      
+      if (confirm('¿Eliminar esta experiencia?')) {
+        expItem.remove();
+      }
+    }
+
+    // Initialize
+    loadCVsFromServer();
+  </script>
+</body>
+</html>
