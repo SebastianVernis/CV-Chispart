@@ -4,15 +4,6 @@
 
 ### 1. Sistema Multi-Usuario Completo
 
-#### Usuario Rafael Predeterminado
-- ✅ Usuario `rafael` con contraseña `RMora1*` pre-configurado
-- ✅ CV Principal completo con toda la información profesional:
-  - Información personal
-  - 2 experiencias profesionales (GSP y GADUSA)
-  - Educación (UNAM)
-  - Habilidades y herramientas completas
-  - Configuración de enfoque del CV
-
 #### Flujo de Registro
 - ✅ Nueva página `/register.html` para crear cuentas
 - ✅ Validaciones de usuario (mín. 3 caracteres) y contraseña (mín. 6 caracteres)
@@ -296,7 +287,6 @@ npm run db:query "SELECT * FROM cvs WHERE user_id='user_rafael'"
 ## ✅ Estado Final
 
 **Sistema completamente funcional con:**
-- ✅ Usuario Rafael con CV completo
 - ✅ Registro de nuevos usuarios operativo
 - ✅ IA optimizada por campo específico
 - ✅ Aislamiento de datos entre usuarios
