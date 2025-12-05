@@ -41,7 +41,6 @@
 
 #### Autenticación Mejorada
 - ✅ Sistema de login actualizado para soportar múltiples usuarios
-- ✅ Usuario Rafael mantiene contraseña hardcoded (`RMora1*`)
 - ✅ Nuevos usuarios usan contraseña en `password_hash` (preparado para bcrypt)
 - ✅ Tokens de sesión únicos por usuario
 
