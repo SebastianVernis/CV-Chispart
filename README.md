@@ -1,4 +1,4 @@
-# CV Manager - Rafael Mora Melo
+# CV Manager 
 
 Sistema de gestión de CVs desplegado en Cloudflare Workers con D1 Database.
 
@@ -331,4 +331,5 @@ Ver [RESUMEN_CAMBIOS.md](./RESUMEN_CAMBIOS.md) para detalles completos.
 
 ## Soporte
 
-Para problemas o preguntas, contacta a rafaelmoramelo@gmail.com
+Para problemas o preguntas, contacta a 
+sebastianvernis@gmail.com 
