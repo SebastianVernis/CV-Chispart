@@ -89,7 +89,6 @@
 1. **`src/index.js`**
    - ✅ Nuevo endpoint `POST /api/register`
    - ✅ Login actualizado para soportar múltiples usuarios
-   - ✅ Mantiene contraseña hardcoded para Rafael
    - ✅ Validaciones de seguridad mejoradas
 
 ### Frontend
@@ -164,9 +163,9 @@ npm run db:init
   "name": "Rafael Mora Melo",
   "role": "Coordinador...",
   "location": "Ciudad de México",
-  "phone": "+52 55 4290 4869",
-  "email": "rafaelmoramelo@gmail.com",
-  "linkedin": "/in/rafaelmoramelo",
+  "phone": "+52 55 4**0 4***",
+  "email": "rafa*****o@gmail.com",
+  "linkedin": "/in/rafo****elo",
   "summary": "Profesional...",
   "cvFocus": "general",
   "experiences": [...], // Completo con responsabilidades
@@ -206,8 +205,8 @@ npm run db:init
 - [ ] Editor inicia vacío para nuevo usuario
 - [ ] Intentar crear usuario duplicado → Error
 
-### Usuario Rafael
-- [ ] Login con `rafael` / `RMora1*` → Éxito
+### Usuario 
+- [ ] Login → Éxito
 - [ ] Ver CV Principal en la lista
 - [ ] CV contiene toda la información
 - [ ] Puede editar y guardar cambios
@@ -278,10 +277,7 @@ npm run db:query "SELECT id, username, email FROM users"
 # Ver CVs por usuario
 npm run db:query "SELECT id, name, user_id FROM cvs"
 
-# Verificar que Rafael tiene su CV
-npm run db:query "SELECT * FROM cvs WHERE user_id='user_rafael'"
 ```
-
 ---
 
 ## ✅ Estado Final
