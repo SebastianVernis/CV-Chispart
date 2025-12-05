@@ -9,4 +9,4 @@ database_name = "cv_database"
 database_id = "7fe78f75-e84e-4207-b6dd-399791b6bb48"
 
 [vars]
-BLACKBOX_API_KEY = "sk-mgu31y6sPid25HyDyFFNMg"
+BLACKBOX_API_KEY = ""
