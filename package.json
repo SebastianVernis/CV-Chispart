@@ -11,7 +11,13 @@
     "db:migrate": "wrangler d1 execute cv_database --file=./migration.sql --remote",
     "db:migrate-email-image": "wrangler d1 execute cv_database --file=./migration_email_image.sql --remote",
     "db:seed": "wrangler d1 execute cv_database --file=./seed_rafael_cv.sql --remote",
-    "db:query": "wrangler d1 execute cv_database --command"
+    "db:query": "wrangler d1 execute cv_database --command",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "db:setup": "node scripts/db-setup.js",
+    "db:verify": "node scripts/db-verify.js",
+    "db:backup": "node scripts/db-backup.js"
   },
   "keywords": [
     "cv",
@@ -21,6 +27,9 @@
   "author": "Rafael Mora Melo",
   "license": "MIT",
   "devDependencies": {
+    "@vitest/ui": "^4.0.15",
+    "happy-dom": "^20.0.11",
+    "vitest": "^4.0.15",
     "wrangler": "^3.0.0"
   },
   "dependencies": {
