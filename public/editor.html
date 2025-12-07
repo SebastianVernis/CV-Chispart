@@ -1974,9 +1974,115 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
       }
     }
 
+    // New function to add drag functionality to sections
+    function addSectionDragFunctionality() {
+      const sections = document.querySelectorAll('.cv-section');
+      
+      sections.forEach(section => {
+        const header = section.querySelector('.section-header');
+        
+        header.setAttribute('draggable', 'true');
+        
+        header.addEventListener('dragstart', (e) => {
+          e.target.closest('.cv-section').classList.add('dragging');
+          e.dataTransfer.setData('text/plain', section.dataset.section);
+        });
+        
+        header.addEventListener('dragend', (e) => {
+          e.target.closest('.cv-section').classList.remove('dragging');
+        });
+      });
+
+      const mainSection = document.getElementById('mainEditorSection');
+      mainSection.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const draggingSection = document.querySelector('.cv-section.dragging');
+        const afterElement = getDragAfterElement(mainSection, e.clientY);
+        
+        if (afterElement == null) {
+          mainSection.appendChild(draggingSection);
+        } else {
+          mainSection.insertBefore(draggingSection, afterElement);
+        }
+      });
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll('.cv-section:not(.dragging)')];
+
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Add section data attributes for drag and drop
+    function prepareSectionDragData() {
+      const sectionConfig = {
+        'personal-info': { order: 0, name: 'Información Personal' },
+        'visual-customization': { order: 1, name: 'Personalización Visual' },
+        'professional-experience': { order: 2, name: 'Experiencia Profesional' },
+        'education': { order: 3, name: 'Educación' },
+        'skills': { order: 4, name: 'Competencias Clave' },
+        'tools': { order: 5, name: 'Herramientas' }
+      };
+
+      const sections = document.querySelectorAll('.section-header');
+      sections.forEach((header, index) => {
+        const section = header.closest('.cv-section');
+        
+        // Try to find a matching section in the config
+        const matchedSection = Object.entries(sectionConfig).find(
+          ([key, config]) => header.textContent.trim().includes(config.name)
+        );
+
+        if (matchedSection) {
+          const [sectionId, sectionConfig] = matchedSection;
+          section.dataset.section = sectionId;
+          section.dataset.order = sectionConfig.order;
+        } else {
+          section.dataset.section = `custom-section-${index}`;
+          section.dataset.order = index;
+        }
+      });
+    }
+
+    // Modify createDefaultCV and loadFormData to add data attributes
+    function createDefaultCVWithSections(originalCreateDefaultCV) {
+      return async function() {
+        const cv = await originalCreateDefaultCV.call(this);
+        setTimeout(prepareSectionDragData, 100);
+        return cv;
+      };
+    }
+
+    const originalCreateDefaultCV = createDefaultCV;
+    createDefaultCV = createDefaultCVWithSections(originalCreateDefaultCV);
+
+    // Call when page loads and after form data is loaded
+    function initializeSectionReordering() {
+      prepareSectionDragData();
+      addSectionDragFunctionality();
+    }
+
+    // Modify the loadFormData to trigger drag setup
+    const originalLoadFormData = loadFormData;
+    loadFormData = function(data) {
+      originalLoadFormData(data);
+      setTimeout(initializeSectionReordering, 100);
+    };
+
     // Initialize
-    loadCVsFromServer();
-    loadAIProviders();
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCVsFromServer();
+      loadAIProviders();
+      initializeSectionReordering();
+    });
   </script>
 </body>
 </html>
