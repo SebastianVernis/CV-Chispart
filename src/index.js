@@ -47,9 +47,6 @@ async function handleAPI(request, env, corsHeaders) {
       }
 
       const apiKeys = {
-        openai: env.OPENAI_API_KEY,
-        anthropic: env.ANTHROPIC_API_KEY,
-        gemini: env.GEMINI_API_KEY,
         blackbox: env.BLACKBOX_API_KEY,
       };
 
@@ -87,15 +84,11 @@ async function handleAPI(request, env, corsHeaders) {
 
       try {
         const apiKeys = {
-          openai: env.OPENAI_API_KEY,
-          anthropic: env.ANTHROPIC_API_KEY,
-          gemini: env.GEMINI_API_KEY,
           blackbox: env.BLACKBOX_API_KEY,
         };
 
         const result = await optimizeWithAI({
-          provider: provider || 'blackbox',
-          model,
+          model: model || 'blackboxai/openai/gpt-4o',
           prompt,
           cvData,
           apiKeys,
@@ -129,11 +122,11 @@ async function handleAPI(request, env, corsHeaders) {
         });
       }
 
-      const { prompt, cvData, providers } = await request.json();
+      const { prompt, cvData, models } = await request.json();
       
-      if (!prompt || !cvData || !providers || providers.length === 0) {
+      if (!prompt || !cvData || !models || models.length === 0) {
         return new Response(JSON.stringify({ 
-          error: 'Prompt, datos del CV y proveedores son requeridos' 
+          error: 'Prompt, datos del CV y modelos son requeridos' 
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -142,14 +135,11 @@ async function handleAPI(request, env, corsHeaders) {
 
       try {
         const apiKeys = {
-          openai: env.OPENAI_API_KEY,
-          anthropic: env.ANTHROPIC_API_KEY,
-          gemini: env.GEMINI_API_KEY,
           blackbox: env.BLACKBOX_API_KEY,
         };
 
         const results = await compareProviders({
-          providers,
+          models,
           prompt,
           cvData,
           apiKeys,

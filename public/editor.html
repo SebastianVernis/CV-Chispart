@@ -532,17 +532,51 @@
         <textarea id="summary"></textarea>
       </div>
 
-      <h2 class="section-header">Enfoque del CV</h2>
-      <div class="form-group">
-        <label for="cvFocus">Sector/Industria Objetivo</label>
-        <select id="cvFocus">
-          <option value="general">General</option>
-          <option value="ong">ONG / Tercer Sector</option>
-          <option value="corporativo">Corporativo</option>
-          <option value="tecnologia">Tecnología</option>
-          <option value="educacion">Educación</option>
-          <option value="gobierno">Gobierno</option>
-        </select>
+      <h2 class="section-header">Personalización Visual</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cvTheme">Tema del CV</label>
+          <select id="cvTheme" onchange="updateThemePreview()">
+            <option value="professional">Profesional (Gris/Teal)</option>
+            <option value="modern">Moderno (Azul/Negro)</option>
+            <option value="creative">Creativo (Púrpura/Naranja)</option>
+            <option value="minimal">Minimalista (Negro/Blanco)</option>
+            <option value="warm">Cálido (Marrón/Crema)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cvFocus">Enfoque del CV</label>
+          <select id="cvFocus">
+            <option value="general">General</option>
+            <option value="ong">ONG / Tercer Sector</option>
+            <option value="corporativo">Corporativo</option>
+            <option value="tecnologia">Tecnología</option>
+            <option value="educacion">Educación</option>
+            <option value="gobierno">Gobierno</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fontFamily">Tipografía</label>
+          <select id="fontFamily" onchange="updateFontPreview()">
+            <option value="inter">Inter (Sans-serif)</option>
+            <option value="roboto">Roboto (Sans-serif)</option>
+            <option value="lato">Lato (Sans-serif)</option>
+            <option value="merriweather">Merriweather (Serif)</option>
+            <option value="playfair">Playfair Display (Serif)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fontSize">Tamaño de Fuente</label>
+          <select id="fontSize">
+            <option value="small">Pequeño (12px)</option>
+            <option value="medium" selected>Mediano (14px)</option>
+            <option value="large">Grande (16px)</option>
+          </select>
+        </div>
       </div>
 
       <h2 class="section-header">Experiencia Profesional</h2>
@@ -691,14 +725,14 @@
       </div>
 
       <div class="form-group">
-        <label>Selecciona proveedores a comparar (mínimo 2):</label>
+        <label>Selecciona modelos a comparar (mínimo 2):</label>
         <div id="providerCheckboxes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
           <!-- Checkboxes se cargarán dinámicamente -->
         </div>
       </div>
 
       <div id="compareLoading" style="display: none; text-align: center; padding: 40px 20px; color: var(--color-teal-500);">
-        <p style="margin: 0; font-size: 14px;">⏳ Comparando respuestas de proveedores...</p>
+        <p style="margin: 0; font-size: 14px;">⏳ Comparando respuestas de modelos...</p>
         <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--color-slate-500);">Esto puede tomar unos segundos</p>
       </div>
 
@@ -726,6 +760,14 @@
     let currentCVId = null;
     let availableProviders = [];
     let selectedProvider = '';
+
+    // Utility function to escape HTML
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
     // Load CVs from server
     async function loadCVsFromServer() {
@@ -784,6 +826,9 @@
           linkedin: '',
           summary: '',
           cvFocus: 'general',
+          cvTheme: 'professional',
+          fontFamily: 'inter',
+          fontSize: 'medium',
           profileImage: null,
           education: [
             {
@@ -881,6 +926,9 @@
         linkedin: document.getElementById('linkedin').value,
         summary: document.getElementById('summary').value,
         cvFocus: document.getElementById('cvFocus').value,
+        cvTheme: document.getElementById('cvTheme').value,
+        fontFamily: document.getElementById('fontFamily').value,
+        fontSize: document.getElementById('fontSize').value,
         profileImage: currentProfileImage,
         experiences: experiences,
         education: education,
@@ -898,6 +946,9 @@
       document.getElementById('linkedin').value = data.linkedin || '';
       document.getElementById('summary').value = data.summary || '';
       document.getElementById('cvFocus').value = data.cvFocus || 'general';
+      document.getElementById('cvTheme').value = data.cvTheme || 'professional';
+      document.getElementById('fontFamily').value = data.fontFamily || 'inter';
+      document.getElementById('fontSize').value = data.fontSize || 'medium';
       document.getElementById('skills').value = data.skills || '';
       document.getElementById('tools').value = data.tools || '';
 
@@ -926,16 +977,16 @@
             </div>
             <div class="form-group">
               <label>Cargo</label>
-              <input type="text" class="exp-role" value="${exp.role || ''}" />
+              <input type="text" class="exp-role" value="${escapeHtml(exp.role || '')}" />
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Empresa</label>
-                <input type="text" class="exp-company" value="${exp.company || ''}" />
+                <input type="text" class="exp-company" value="${escapeHtml(exp.company || '')}" />
               </div>
               <div class="form-group">
                 <label>Período</label>
-                <input type="text" class="exp-dates" value="${exp.dates || ''}" />
+                <input type="text" class="exp-dates" value="${escapeHtml(exp.dates || '')}" />
               </div>
             </div>
             <div class="form-group">
@@ -943,7 +994,7 @@
                 <label style="margin: 0;">Responsabilidades (una por línea)</label>
                 <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="optimizeResponsibilities(this)">🤖 Optimizar</button>
               </div>
-              <textarea class="exp-responsibilities">${exp.responsibilities || ''}</textarea>
+              <textarea class="exp-responsibilities">${escapeHtml(exp.responsibilities || '')}</textarea>
             </div>
           `;
           container.appendChild(div);
@@ -965,16 +1016,16 @@
             </div>
             <div class="form-group">
               <label>Título/Grado</label>
-              <input type="text" class="edu-degree" value="${edu.degree || ''}" />
+              <input type="text" class="edu-degree" value="${escapeHtml(edu.degree || '')}" />
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Institución</label>
-                <input type="text" class="edu-institution" value="${edu.institution || ''}" />
+                <input type="text" class="edu-institution" value="${escapeHtml(edu.institution || '')}" />
               </div>
               <div class="form-group">
                 <label>Período</label>
-                <input type="text" class="edu-dates" value="${edu.dates || ''}" />
+                <input type="text" class="edu-dates" value="${escapeHtml(edu.dates || '')}" />
               </div>
             </div>
           `;
@@ -1360,7 +1411,7 @@ Genera una lista mejorada y actualizada de herramientas/software relevantes. Res
       }
     }
 
-    function copyFieldSuggestion() {
+    function copyFieldSuggestion(event) {
       navigator.clipboard.writeText(fieldSuggestion).then(() => {
         const btn = event.target;
         const originalText = btn.textContent;
@@ -1457,7 +1508,7 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
             body: JSON.stringify({ 
               prompt, 
               cvData: contextData,
-              provider: selectedProvider 
+              model: selectedProvider 
             }),
           });
 
@@ -1540,7 +1591,7 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
           body: JSON.stringify({ 
             prompt, 
             cvData,
-            provider: selectedProvider 
+            model: selectedProvider 
           }),
         });
 
@@ -1564,7 +1615,7 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
 
 
 
-    function copyAISuggestion() {
+    function copyAISuggestion(event) {
       navigator.clipboard.writeText(lastAISuggestion).then(() => {
         const btn = event.target;
         const originalText = btn.textContent;
@@ -1736,18 +1787,30 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
         
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = `provider-${provider.id}`;
+        checkbox.id = `model-${provider.id}`;
         checkbox.value = provider.id;
         checkbox.checked = provider.default || false;
         
         const label = document.createElement('label');
-        label.htmlFor = `provider-${provider.id}`;
+        label.htmlFor = `model-${provider.id}`;
         label.textContent = provider.name;
         
         div.appendChild(checkbox);
         div.appendChild(label);
         container.appendChild(div);
       });
+    }
+
+    function updateThemePreview() {
+      const theme = document.getElementById('cvTheme').value;
+      console.log('Tema seleccionado:', theme);
+      // El tema se aplicará en la vista previa
+    }
+
+    function updateFontPreview() {
+      const font = document.getElementById('fontFamily').value;
+      console.log('Fuente seleccionada:', font);
+      // La fuente se aplicará en la vista previa
     }
 
     // Compare providers modal functions
@@ -1769,14 +1832,14 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
         return;
       }
 
-      // Get selected providers
-      const selectedProviders = [];
+      // Get selected models
+      const selectedModels = [];
       document.querySelectorAll('#providerCheckboxes input[type="checkbox"]:checked').forEach(checkbox => {
-        selectedProviders.push(checkbox.value);
+        selectedModels.push(checkbox.value);
       });
 
-      if (selectedProviders.length < 2) {
-        alert('Por favor selecciona al menos 2 proveedores para comparar');
+      if (selectedModels.length < 2) {
+        alert('Por favor selecciona al menos 2 modelos para comparar');
         return;
       }
 
@@ -1799,7 +1862,7 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
           body: JSON.stringify({ 
             prompt, 
             cvData,
-            providers: selectedProviders
+            models: selectedModels
           }),
         });
 
@@ -1824,41 +1887,55 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
       const container = document.getElementById('compareResultsContainer');
       container.innerHTML = '';
 
-      results.forEach(result => {
+      results.forEach((result, index) => {
         const div = document.createElement('div');
         
         if (result.success) {
           div.className = 'comparison-result';
-          div.innerHTML = `
-            <div class="comparison-result-header">
-              <span class="comparison-result-provider">${result.provider}</span>
-              <div class="comparison-result-meta">
-                <span>⏱️ ${result.responseTime}ms</span>
-                <span>📝 ${result.suggestion.length} caracteres</span>
-              </div>
-            </div>
-            <div class="comparison-result-content">${result.suggestion}</div>
-            <div class="comparison-result-actions">
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="copyComparisonResult('${result.provider}', \`${result.suggestion.replace(/`/g, '\\`').replace(/\$/g, '\\
-  </script>
-</body>
-</html>
-)}\`)">📋 Copiar</button>
-              <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="applyComparisonResult(\`${result.suggestion.replace(/`/g, '\\`').replace(/\$/g, '\\
-  </script>
-</body>
-</html>
-)}\`)">✅ Aplicar</button>
+          
+          const header = document.createElement('div');
+          header.className = 'comparison-result-header';
+          header.innerHTML = `
+            <span class="comparison-result-provider">${escapeHtml(result.model || result.provider || 'Modelo IA')}</span>
+            <div class="comparison-result-meta">
+              <span>⏱️ ${result.responseTime}ms</span>
+              <span>📝 ${result.suggestion.length} caracteres</span>
             </div>
           `;
+          
+          const content = document.createElement('div');
+          content.className = 'comparison-result-content';
+          content.textContent = result.suggestion;
+          
+          const actions = document.createElement('div');
+          actions.className = 'comparison-result-actions';
+          
+          const copyBtn = document.createElement('button');
+          copyBtn.className = 'btn btn-secondary';
+          copyBtn.style.cssText = 'padding: 6px 12px; font-size: 12px;';
+          copyBtn.textContent = '📋 Copiar';
+          copyBtn.onclick = () => copyComparisonResult(result.model || result.provider, result.suggestion);
+          
+          const applyBtn = document.createElement('button');
+          applyBtn.className = 'btn btn-primary';
+          applyBtn.style.cssText = 'padding: 6px 12px; font-size: 12px;';
+          applyBtn.textContent = '✅ Aplicar';
+          applyBtn.onclick = () => applyComparisonResult(result.suggestion);
+          
+          actions.appendChild(copyBtn);
+          actions.appendChild(applyBtn);
+          
+          div.appendChild(header);
+          div.appendChild(content);
+          div.appendChild(actions);
         } else {
           div.className = 'comparison-error';
           div.innerHTML = `
             <div class="comparison-error-header">
               <span>❌</span>
-              <span class="comparison-error-provider">${result.provider}</span>
+              <span class="comparison-error-provider">${escapeHtml(result.model || result.provider || 'Modelo IA')}</span>
             </div>
-            <div class="comparison-error-message">${result.error}</div>
+            <div class="comparison-error-message">${escapeHtml(result.error)}</div>
           `;
         }
         
@@ -1868,12 +1945,7 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
 
     function copyComparisonResult(provider, text) {
       navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = '✅ Copiado';
-        setTimeout(() => {
-          btn.textContent = originalText;
-        }, 2000);
+        alert(`✅ Copiado al portapapeles`);
       }).catch(err => {
         console.error('Error al copiar:', err);
         alert('No se pudo copiar el resultado');

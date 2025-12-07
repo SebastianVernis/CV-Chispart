@@ -504,8 +504,7 @@
               <p class="contact-item" id="email"></p>
               <p class="contact-item" id="linkedin"></p>
             </div>
-            <div class="profile-image-placeholder" style="flex-shrink: 0; margin-top: 0;">
-              <img src="Rafael_Mora.jpeg" alt="Foto de perfil" >
+            <div class="profile-image-placeholder" style="flex-shrink: 0; margin-top: 0;" id="profileImageContainer">
             </div>
           </div>
         </header>
@@ -555,7 +554,76 @@
   <script>
     const cvData = JSON.parse(localStorage.getItem('previewCV'));
 
+    // Theme configurations
+    const themes = {
+      professional: {
+        primary: '#21808d',
+        secondary: '#13343b',
+        accent: '#f5f5f5',
+        text: '#13343b',
+        background: 'linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 40%, #f7f7f7 100%)'
+      },
+      modern: {
+        primary: '#2563eb',
+        secondary: '#1e293b',
+        accent: '#f8fafc',
+        text: '#0f172a',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 40%, #f1f5f9 100%)'
+      },
+      creative: {
+        primary: '#9333ea',
+        secondary: '#f97316',
+        accent: '#fef3c7',
+        text: '#292524',
+        background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #fef3c7 100%)'
+      },
+      minimal: {
+        primary: '#000000',
+        secondary: '#404040',
+        accent: '#ffffff',
+        text: '#000000',
+        background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 40%, #ffffff 100%)'
+      },
+      warm: {
+        primary: '#a85a2f',
+        secondary: '#5e5240',
+        accent: '#fcfcf9',
+        text: '#5e5240',
+        background: 'linear-gradient(135deg, #fcfcf9 0%, #f5efe5 40%, #fcfcf9 100%)'
+      }
+    };
+
+    const fonts = {
+      inter: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      roboto: "'Roboto', -apple-system, BlinkMacSystemFont, sans-serif",
+      lato: "'Lato', -apple-system, BlinkMacSystemFont, sans-serif",
+      merriweather: "'Merriweather', Georgia, serif",
+      playfair: "'Playfair Display', Georgia, serif"
+    };
+
+    const fontSizes = {
+      small: '12px',
+      medium: '14px',
+      large: '16px'
+    };
+
     if (cvData) {
+      // Apply theme
+      const theme = themes[cvData.cvTheme] || themes.professional;
+      const root = document.documentElement;
+      root.style.setProperty('--color-primary', theme.primary);
+      root.style.setProperty('--color-text', theme.text);
+      root.style.setProperty('--color-text-secondary', theme.secondary);
+      document.body.style.background = theme.background;
+      
+      // Apply font
+      const fontFamily = fonts[cvData.fontFamily] || fonts.inter;
+      document.body.style.fontFamily = fontFamily;
+      
+      // Apply font size
+      const fontSize = fontSizes[cvData.fontSize] || fontSizes.medium;
+      root.style.setProperty('--font-size-base', fontSize);
+
       document.getElementById('name').textContent = cvData.name || '';
       document.getElementById('role').textContent = cvData.role || '';
       document.getElementById('location').textContent = cvData.location || '';
