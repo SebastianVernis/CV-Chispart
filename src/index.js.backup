@@ -36,32 +36,7 @@ async function handleAPI(request, env, corsHeaders) {
   const path = url.pathname;
 
   try {
-    // Get available AI providers
-    if (path === '/api/ai/providers' && request.method === 'GET') {
-      const authHeader = request.headers.get('Authorization');
-      if (!isAuthenticated(authHeader)) {
-        return new Response(JSON.stringify({ error: 'No autorizado' }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      const apiKeys = {
-        blackbox: env.BLACKBOX_API_KEY,
-      };
-
-      const availableProviders = getAvailableProviders(apiKeys);
-
-      return new Response(JSON.stringify({ 
-        success: true,
-        providers: availableProviders,
-        allProviders: AI_PROVIDERS,
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // AI optimization endpoint - single provider
+    // AI Assistant endpoint
     if (path === '/api/ai/optimize' && request.method === 'POST') {
       const authHeader = request.headers.get('Authorization');
       if (!isAuthenticated(authHeader)) {
@@ -71,90 +46,48 @@ async function handleAPI(request, env, corsHeaders) {
         });
       }
 
-      const { prompt, cvData, provider, model } = await request.json();
+      const { prompt, cvData } = await request.json();
       
-      if (!prompt || !cvData) {
-        return new Response(JSON.stringify({ 
-          error: 'Prompt y datos del CV son requeridos' 
-        }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
       try {
-        const apiKeys = {
-          blackbox: env.BLACKBOX_API_KEY,
-        };
-
-        const result = await optimizeWithAI({
-          model: model || 'blackboxai/openai/gpt-4o',
-          prompt,
-          cvData,
-          apiKeys,
+        const aiResponse = await fetch('https://api.blackbox.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${env.BLACKBOX_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: 'blackboxai/openai/gpt-4o',
+            messages: [
+              {
+                role: 'system',
+                content: 'Eres un experto en recursos humanos y redacción de CVs profesionales. Ayudas a optimizar CVs para que sean más efectivos y atractivos para reclutadores. Responde en español de forma clara y concisa.'
+              },
+              {
+                role: 'user',
+                content: `${prompt}\n\nDatos del CV actual:\n${JSON.stringify(cvData, null, 2)}`
+              }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+            stream: false
+          }),
         });
 
+        if (!aiResponse.ok) {
+          throw new Error(`Error de Blackbox AI: ${aiResponse.status}`);
+        }
+
+        const aiData = await aiResponse.json();
         return new Response(JSON.stringify({ 
-          success: true,
-          ...result,
+          success: true, 
+          suggestion: aiData.choices[0].message.content 
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } catch (aiError) {
-        console.error('Error calling AI provider:', aiError);
+        console.error('Error calling Blackbox AI:', aiError);
         return new Response(JSON.stringify({ 
           error: 'Error al procesar la solicitud con IA',
-          details: aiError.message 
-        }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-    }
-
-    // AI comparison endpoint - multiple providers
-    if (path === '/api/ai/compare' && request.method === 'POST') {
-      const authHeader = request.headers.get('Authorization');
-      if (!isAuthenticated(authHeader)) {
-        return new Response(JSON.stringify({ error: 'No autorizado' }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      const { prompt, cvData, models } = await request.json();
-      
-      if (!prompt || !cvData || !models || models.length === 0) {
-        return new Response(JSON.stringify({ 
-          error: 'Prompt, datos del CV y modelos son requeridos' 
-        }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      try {
-        const apiKeys = {
-          blackbox: env.BLACKBOX_API_KEY,
-        };
-
-        const results = await compareProviders({
-          models,
-          prompt,
-          cvData,
-          apiKeys,
-        });
-
-        return new Response(JSON.stringify({ 
-          success: true,
-          results,
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      } catch (aiError) {
-        console.error('Error comparing AI providers:', aiError);
-        return new Response(JSON.stringify({ 
-          error: 'Error al comparar proveedores de IA',
           details: aiError.message 
         }), {
           status: 500,

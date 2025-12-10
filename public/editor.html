@@ -347,13 +347,125 @@
         grid-template-columns: 1fr;
       }
     }
+
+    .provider-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .provider-checkbox:hover {
+      background: #f0f0f0;
+      border-color: var(--color-teal-500);
+    }
+
+    .provider-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .provider-checkbox label {
+      cursor: pointer;
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .comparison-result {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    .comparison-result:hover {
+      border-color: var(--color-teal-500);
+      box-shadow: 0 4px 12px rgba(33, 128, 141, 0.1);
+    }
+
+    .comparison-result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .comparison-result-provider {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-slate-900);
+    }
+
+    .comparison-result-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      color: var(--color-slate-500);
+    }
+
+    .comparison-result-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-slate-900);
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .comparison-result-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .comparison-error {
+      background: #fee;
+      border: 2px solid #fcc;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .comparison-error-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .comparison-error-provider {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-red-500);
+    }
+
+    .comparison-error-message {
+      font-size: 13px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Editor de CV</h1>
     <div class="header-actions">
+      <select id="aiProviderSelect" class="btn btn-secondary" style="padding: 10px 15px; cursor: pointer;">
+        <option value="">Cargando proveedores...</option>
+      </select>
       <button class="btn btn-secondary" onclick="askAI()">🤖 Asistente IA</button>
+      <button class="btn btn-secondary" onclick="compareProviders()">🔄 Comparar IA</button>
       <button class="btn btn-secondary" onclick="previewCV()">Vista Previa</button>
       <button class="btn btn-primary" onclick="saveCV()">Guardar CV</button>
       <button class="btn btn-secondary" onclick="logout()">Cerrar Sesión</button>
@@ -420,17 +532,51 @@
         <textarea id="summary"></textarea>
       </div>
 
-      <h2 class="section-header">Enfoque del CV</h2>
-      <div class="form-group">
-        <label for="cvFocus">Sector/Industria Objetivo</label>
-        <select id="cvFocus">
-          <option value="general">General</option>
-          <option value="ong">ONG / Tercer Sector</option>
-          <option value="corporativo">Corporativo</option>
-          <option value="tecnologia">Tecnología</option>
-          <option value="educacion">Educación</option>
-          <option value="gobierno">Gobierno</option>
-        </select>
+      <h2 class="section-header">Personalización Visual</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cvTheme">Tema del CV</label>
+          <select id="cvTheme" onchange="updateThemePreview()">
+            <option value="professional">Profesional (Gris/Teal)</option>
+            <option value="modern">Moderno (Azul/Negro)</option>
+            <option value="creative">Creativo (Púrpura/Naranja)</option>
+            <option value="minimal">Minimalista (Negro/Blanco)</option>
+            <option value="warm">Cálido (Marrón/Crema)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cvFocus">Enfoque del CV</label>
+          <select id="cvFocus">
+            <option value="general">General</option>
+            <option value="ong">ONG / Tercer Sector</option>
+            <option value="corporativo">Corporativo</option>
+            <option value="tecnologia">Tecnología</option>
+            <option value="educacion">Educación</option>
+            <option value="gobierno">Gobierno</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fontFamily">Tipografía</label>
+          <select id="fontFamily" onchange="updateFontPreview()">
+            <option value="inter">Inter (Sans-serif)</option>
+            <option value="roboto">Roboto (Sans-serif)</option>
+            <option value="lato">Lato (Sans-serif)</option>
+            <option value="merriweather">Merriweather (Serif)</option>
+            <option value="playfair">Playfair Display (Serif)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fontSize">Tamaño de Fuente</label>
+          <select id="fontSize">
+            <option value="small">Pequeño (12px)</option>
+            <option value="medium" selected>Mediano (14px)</option>
+            <option value="large">Grande (16px)</option>
+          </select>
+        </div>
       </div>
 
       <h2 class="section-header">Experiencia Profesional</h2>
@@ -568,6 +714,42 @@
     </div>
   </div>
 
+  <!-- Modal para comparación de proveedores IA -->
+  <div class="modal" id="compareModal">
+    <div class="modal-content" style="max-width: 1000px; max-height: 90vh;">
+      <h2>🔄 Comparación de Proveedores IA</h2>
+      
+      <div class="form-group">
+        <label for="comparePrompt">¿Qué deseas optimizar?</label>
+        <textarea id="comparePrompt" placeholder="Ej: Optimiza mi perfil profesional para el sector de ONGs" style="min-height: 80px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Selecciona modelos a comparar (mínimo 2):</label>
+        <div id="providerCheckboxes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+          <!-- Checkboxes se cargarán dinámicamente -->
+        </div>
+      </div>
+
+      <div id="compareLoading" style="display: none; text-align: center; padding: 40px 20px; color: var(--color-teal-500);">
+        <p style="margin: 0; font-size: 14px;">⏳ Comparando respuestas de modelos...</p>
+        <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--color-slate-500);">Esto puede tomar unos segundos</p>
+      </div>
+
+      <div id="compareResults" style="display: none; margin-top: 20px;">
+        <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--color-slate-900);">Resultados:</h3>
+        <div id="compareResultsContainer" style="display: grid; gap: 15px;">
+          <!-- Resultados se cargarán dinámicamente -->
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeCompareModal()">Cerrar</button>
+        <button class="btn btn-primary" onclick="submitComparison()" id="compareSubmitBtn">Comparar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     if (!sessionStorage.getItem('authenticated')) {
       window.location.href = 'login.html';
@@ -576,6 +758,16 @@
     const authToken = sessionStorage.getItem('authToken');
     let cvs = [];
     let currentCVId = null;
+    let availableProviders = [];
+    let selectedProvider = '';
+
+    // Utility function to escape HTML
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
     // Load CVs from server
     async function loadCVsFromServer() {
@@ -634,6 +826,9 @@
           linkedin: '',
           summary: '',
           cvFocus: 'general',
+          cvTheme: 'professional',
+          fontFamily: 'inter',
+          fontSize: 'medium',
           profileImage: null,
           education: [
             {
@@ -731,6 +926,9 @@
         linkedin: document.getElementById('linkedin').value,
         summary: document.getElementById('summary').value,
         cvFocus: document.getElementById('cvFocus').value,
+        cvTheme: document.getElementById('cvTheme').value,
+        fontFamily: document.getElementById('fontFamily').value,
+        fontSize: document.getElementById('fontSize').value,
         profileImage: currentProfileImage,
         experiences: experiences,
         education: education,
@@ -748,6 +946,9 @@
       document.getElementById('linkedin').value = data.linkedin || '';
       document.getElementById('summary').value = data.summary || '';
       document.getElementById('cvFocus').value = data.cvFocus || 'general';
+      document.getElementById('cvTheme').value = data.cvTheme || 'professional';
+      document.getElementById('fontFamily').value = data.fontFamily || 'inter';
+      document.getElementById('fontSize').value = data.fontSize || 'medium';
       document.getElementById('skills').value = data.skills || '';
       document.getElementById('tools').value = data.tools || '';
 
@@ -776,16 +977,16 @@
             </div>
             <div class="form-group">
               <label>Cargo</label>
-              <input type="text" class="exp-role" value="${exp.role || ''}" />
+              <input type="text" class="exp-role" value="${escapeHtml(exp.role || '')}" />
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Empresa</label>
-                <input type="text" class="exp-company" value="${exp.company || ''}" />
+                <input type="text" class="exp-company" value="${escapeHtml(exp.company || '')}" />
               </div>
               <div class="form-group">
                 <label>Período</label>
-                <input type="text" class="exp-dates" value="${exp.dates || ''}" />
+                <input type="text" class="exp-dates" value="${escapeHtml(exp.dates || '')}" />
               </div>
             </div>
             <div class="form-group">
@@ -793,7 +994,7 @@
                 <label style="margin: 0;">Responsabilidades (una por línea)</label>
                 <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="optimizeResponsibilities(this)">🤖 Optimizar</button>
               </div>
-              <textarea class="exp-responsibilities">${exp.responsibilities || ''}</textarea>
+              <textarea class="exp-responsibilities">${escapeHtml(exp.responsibilities || '')}</textarea>
             </div>
           `;
           container.appendChild(div);
@@ -815,16 +1016,16 @@
             </div>
             <div class="form-group">
               <label>Título/Grado</label>
-              <input type="text" class="edu-degree" value="${edu.degree || ''}" />
+              <input type="text" class="edu-degree" value="${escapeHtml(edu.degree || '')}" />
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Institución</label>
-                <input type="text" class="edu-institution" value="${edu.institution || ''}" />
+                <input type="text" class="edu-institution" value="${escapeHtml(edu.institution || '')}" />
               </div>
               <div class="form-group">
                 <label>Período</label>
-                <input type="text" class="edu-dates" value="${edu.dates || ''}" />
+                <input type="text" class="edu-dates" value="${escapeHtml(edu.dates || '')}" />
               </div>
             </div>
           `;
@@ -1183,7 +1384,11 @@ Genera una lista mejorada y actualizada de herramientas/software relevantes. Res
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ prompt, cvData: contextData }),
+          body: JSON.stringify({ 
+            prompt, 
+            cvData: contextData,
+            provider: selectedProvider 
+          }),
         });
 
         const data = await res.json();
@@ -1206,7 +1411,7 @@ Genera una lista mejorada y actualizada de herramientas/software relevantes. Res
       }
     }
 
-    function copyFieldSuggestion() {
+    function copyFieldSuggestion(event) {
       navigator.clipboard.writeText(fieldSuggestion).then(() => {
         const btn = event.target;
         const originalText = btn.textContent;
@@ -1300,7 +1505,11 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
               'Authorization': `Bearer ${authToken}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ prompt, cvData: contextData }),
+            body: JSON.stringify({ 
+              prompt, 
+              cvData: contextData,
+              model: selectedProvider 
+            }),
           });
 
           const data = await res.json();
@@ -1379,7 +1588,11 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ prompt, cvData }),
+          body: JSON.stringify({ 
+            prompt, 
+            cvData,
+            model: selectedProvider 
+          }),
         });
 
         const data = await res.json();
@@ -1402,7 +1615,7 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
 
 
 
-    function copyAISuggestion() {
+    function copyAISuggestion(event) {
       navigator.clipboard.writeText(lastAISuggestion).then(() => {
         const btn = event.target;
         const originalText = btn.textContent;
@@ -1509,8 +1722,367 @@ Genera una versión mejorada, más profesional y enfocada en logros. Usa viñeta
       }
     }
 
+    // Load available AI providers
+    async function loadAIProviders() {
+      try {
+        const response = await fetch('/api/ai/providers', {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          availableProviders = data.providers || [];
+          
+          const select = document.getElementById('aiProviderSelect');
+          select.innerHTML = '';
+          
+          if (availableProviders.length === 0) {
+            select.innerHTML = '<option value="">Sin proveedores</option>';
+            return;
+          }
+          
+          availableProviders.forEach(provider => {
+            const option = document.createElement('option');
+            option.value = provider.id;
+            option.textContent = provider.name;
+            if (provider.default) {
+              option.selected = true;
+              selectedProvider = provider.id;
+            }
+            select.appendChild(option);
+          });
+          
+          // Set default if none selected
+          if (!selectedProvider && availableProviders.length > 0) {
+            selectedProvider = availableProviders[0].id;
+            select.value = selectedProvider;
+          }
+          
+          // Add change listener
+          select.addEventListener('change', (e) => {
+            selectedProvider = e.target.value;
+          });
+          
+          // Populate checkboxes for comparison modal
+          populateProviderCheckboxes();
+        } else {
+          console.error('Error loading providers');
+          document.getElementById('aiProviderSelect').innerHTML = '<option value="">Error al cargar</option>';
+        }
+      } catch (error) {
+        console.error('Error fetching providers:', error);
+        document.getElementById('aiProviderSelect').innerHTML = '<option value="">Error de conexión</option>';
+      }
+    }
+
+    function populateProviderCheckboxes() {
+      const container = document.getElementById('providerCheckboxes');
+      container.innerHTML = '';
+      
+      availableProviders.forEach(provider => {
+        const div = document.createElement('div');
+        div.className = 'provider-checkbox';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `model-${provider.id}`;
+        checkbox.value = provider.id;
+        checkbox.checked = provider.default || false;
+        
+        const label = document.createElement('label');
+        label.htmlFor = `model-${provider.id}`;
+        label.textContent = provider.name;
+        
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        container.appendChild(div);
+      });
+    }
+
+    function updateThemePreview() {
+      const theme = document.getElementById('cvTheme').value;
+      console.log('Tema seleccionado:', theme);
+      // El tema se aplicará en la vista previa
+    }
+
+    function updateFontPreview() {
+      const font = document.getElementById('fontFamily').value;
+      console.log('Fuente seleccionada:', font);
+      // La fuente se aplicará en la vista previa
+    }
+
+    // Compare providers modal functions
+    function compareProviders() {
+      document.getElementById('compareModal').classList.add('show');
+      document.getElementById('comparePrompt').value = '';
+      document.getElementById('compareResults').style.display = 'none';
+      document.getElementById('compareLoading').style.display = 'none';
+    }
+
+    function closeCompareModal() {
+      document.getElementById('compareModal').classList.remove('show');
+    }
+
+    async function submitComparison() {
+      const prompt = document.getElementById('comparePrompt').value.trim();
+      if (!prompt) {
+        alert('Por favor ingresa una solicitud para comparar');
+        return;
+      }
+
+      // Get selected models
+      const selectedModels = [];
+      document.querySelectorAll('#providerCheckboxes input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedModels.push(checkbox.value);
+      });
+
+      if (selectedModels.length < 2) {
+        alert('Por favor selecciona al menos 2 modelos para comparar');
+        return;
+      }
+
+      const cvData = collectFormData();
+      const loading = document.getElementById('compareLoading');
+      const results = document.getElementById('compareResults');
+      const submitBtn = document.getElementById('compareSubmitBtn');
+
+      loading.style.display = 'block';
+      results.style.display = 'none';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/ai/compare', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            prompt, 
+            cvData,
+            models: selectedModels
+          }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          displayComparisonResults(data.results);
+          results.style.display = 'block';
+        } else {
+          alert('Error: ' + (data.error || 'No se pudo procesar la comparación'));
+        }
+      } catch (error) {
+        console.error('Error comparing providers:', error);
+        alert('Error al conectar con el servicio de comparación');
+      } finally {
+        loading.style.display = 'none';
+        submitBtn.disabled = false;
+      }
+    }
+
+    function displayComparisonResults(results) {
+      const container = document.getElementById('compareResultsContainer');
+      container.innerHTML = '';
+
+      results.forEach((result, index) => {
+        const div = document.createElement('div');
+        
+        if (result.success) {
+          div.className = 'comparison-result';
+          
+          const header = document.createElement('div');
+          header.className = 'comparison-result-header';
+          header.innerHTML = `
+            <span class="comparison-result-provider">${escapeHtml(result.model || result.provider || 'Modelo IA')}</span>
+            <div class="comparison-result-meta">
+              <span>⏱️ ${result.responseTime}ms</span>
+              <span>📝 ${result.suggestion.length} caracteres</span>
+            </div>
+          `;
+          
+          const content = document.createElement('div');
+          content.className = 'comparison-result-content';
+          content.textContent = result.suggestion;
+          
+          const actions = document.createElement('div');
+          actions.className = 'comparison-result-actions';
+          
+          const copyBtn = document.createElement('button');
+          copyBtn.className = 'btn btn-secondary';
+          copyBtn.style.cssText = 'padding: 6px 12px; font-size: 12px;';
+          copyBtn.textContent = '📋 Copiar';
+          copyBtn.onclick = () => copyComparisonResult(result.model || result.provider, result.suggestion);
+          
+          const applyBtn = document.createElement('button');
+          applyBtn.className = 'btn btn-primary';
+          applyBtn.style.cssText = 'padding: 6px 12px; font-size: 12px;';
+          applyBtn.textContent = '✅ Aplicar';
+          applyBtn.onclick = () => applyComparisonResult(result.suggestion);
+          
+          actions.appendChild(copyBtn);
+          actions.appendChild(applyBtn);
+          
+          div.appendChild(header);
+          div.appendChild(content);
+          div.appendChild(actions);
+        } else {
+          div.className = 'comparison-error';
+          div.innerHTML = `
+            <div class="comparison-error-header">
+              <span>❌</span>
+              <span class="comparison-error-provider">${escapeHtml(result.model || result.provider || 'Modelo IA')}</span>
+            </div>
+            <div class="comparison-error-message">${escapeHtml(result.error)}</div>
+          `;
+        }
+        
+        container.appendChild(div);
+      });
+    }
+
+    function copyComparisonResult(provider, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert(`✅ Copiado al portapapeles`);
+      }).catch(err => {
+        console.error('Error al copiar:', err);
+        alert('No se pudo copiar el resultado');
+      });
+    }
+
+    function applyComparisonResult(text) {
+      // Try to detect which field this should apply to based on context
+      // For now, we'll show a simple prompt
+      const field = prompt('¿A qué campo deseas aplicar este resultado?\n\nOpciones: summary, skills, tools', 'summary');
+      
+      if (field && ['summary', 'skills', 'tools'].includes(field)) {
+        document.getElementById(field).value = text;
+        
+        // Visual feedback
+        const fieldElement = document.getElementById(field);
+        fieldElement.style.background = '#d1fae5';
+        setTimeout(() => {
+          fieldElement.style.background = '';
+        }, 1000);
+        
+        alert('✅ Contenido aplicado. No olvides guardar los cambios.');
+        closeCompareModal();
+      } else {
+        alert('Campo no válido. Usa: summary, skills o tools');
+      }
+    }
+
+    // New function to add drag functionality to sections
+    function addSectionDragFunctionality() {
+      const sections = document.querySelectorAll('.cv-section');
+      
+      sections.forEach(section => {
+        const header = section.querySelector('.section-header');
+        
+        header.setAttribute('draggable', 'true');
+        
+        header.addEventListener('dragstart', (e) => {
+          e.target.closest('.cv-section').classList.add('dragging');
+          e.dataTransfer.setData('text/plain', section.dataset.section);
+        });
+        
+        header.addEventListener('dragend', (e) => {
+          e.target.closest('.cv-section').classList.remove('dragging');
+        });
+      });
+
+      const mainSection = document.getElementById('mainEditorSection');
+      mainSection.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const draggingSection = document.querySelector('.cv-section.dragging');
+        const afterElement = getDragAfterElement(mainSection, e.clientY);
+        
+        if (afterElement == null) {
+          mainSection.appendChild(draggingSection);
+        } else {
+          mainSection.insertBefore(draggingSection, afterElement);
+        }
+      });
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll('.cv-section:not(.dragging)')];
+
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Add section data attributes for drag and drop
+    function prepareSectionDragData() {
+      const sectionConfig = {
+        'personal-info': { order: 0, name: 'Información Personal' },
+        'visual-customization': { order: 1, name: 'Personalización Visual' },
+        'professional-experience': { order: 2, name: 'Experiencia Profesional' },
+        'education': { order: 3, name: 'Educación' },
+        'skills': { order: 4, name: 'Competencias Clave' },
+        'tools': { order: 5, name: 'Herramientas' }
+      };
+
+      const sections = document.querySelectorAll('.section-header');
+      sections.forEach((header, index) => {
+        const section = header.closest('.cv-section');
+        
+        // Try to find a matching section in the config
+        const matchedSection = Object.entries(sectionConfig).find(
+          ([key, config]) => header.textContent.trim().includes(config.name)
+        );
+
+        if (matchedSection) {
+          const [sectionId, sectionConfig] = matchedSection;
+          section.dataset.section = sectionId;
+          section.dataset.order = sectionConfig.order;
+        } else {
+          section.dataset.section = `custom-section-${index}`;
+          section.dataset.order = index;
+        }
+      });
+    }
+
+    // Modify createDefaultCV and loadFormData to add data attributes
+    function createDefaultCVWithSections(originalCreateDefaultCV) {
+      return async function() {
+        const cv = await originalCreateDefaultCV.call(this);
+        setTimeout(prepareSectionDragData, 100);
+        return cv;
+      };
+    }
+
+    const originalCreateDefaultCV = createDefaultCV;
+    createDefaultCV = createDefaultCVWithSections(originalCreateDefaultCV);
+
+    // Call when page loads and after form data is loaded
+    function initializeSectionReordering() {
+      prepareSectionDragData();
+      addSectionDragFunctionality();
+    }
+
+    // Modify the loadFormData to trigger drag setup
+    const originalLoadFormData = loadFormData;
+    loadFormData = function(data) {
+      originalLoadFormData(data);
+      setTimeout(initializeSectionReordering, 100);
+    };
+
     // Initialize
-    loadCVsFromServer();
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCVsFromServer();
+      loadAIProviders();
+      initializeSectionReordering();
+    });
   </script>
 </body>
 </html>
