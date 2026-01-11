@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitar Acceso - CV Rafael Mora</title>
+  <style>
+    :root {
+      --color-cream-50: rgba(252, 252, 249, 1);
+      --color-teal-500: rgba(33, 128, 141, 1);
+      --color-teal-600: rgba(29, 116, 128, 1);
+      --color-slate-900: rgba(19, 52, 59, 1);
+      --color-slate-500: rgba(98, 108, 113, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .register-container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .register-container h1 {
+      color: var(--color-slate-900);
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .register-container p {
+      color: var(--color-slate-500);
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-slate-900);
+      margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--color-teal-500);
+      box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin-top: 3px;
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-weight: normal;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .plan-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .plan-option {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .plan-option:hover {
+      border-color: var(--color-teal-500);
+      background: rgba(33, 128, 141, 0.05);
+    }
+
+    .plan-option.selected {
+      border-color: var(--color-teal-500);
+      background: rgba(33, 128, 141, 0.1);
+    }
+
+    .plan-option input[type="radio"] {
+      display: none;
+    }
+
+    .plan-name {
+      font-weight: 600;
+      color: var(--color-slate-900);
+      margin-bottom: 5px;
+    }
+
+    .plan-price {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--color-teal-500);
+      margin-bottom: 5px;
+    }
+
+    .plan-period {
+      font-size: 12px;
+      color: var(--color-slate-500);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn-primary {
+      background: var(--color-teal-500);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-teal-600);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(33, 128, 141, 0.3);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-message, .success-message {
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .error-message {
+      background: #fee;
+      color: #c33;
+    }
+
+    .success-message {
+      background: #efe;
+      color: #3a3;
+    }
+
+    .error-message.show, .success-message.show {
+      display: block;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--color-slate-500);
+    }
+
+    .login-link a {
+      color: var(--color-teal-500);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .custom-solution-field {
+      display: none;
+    }
+
+    .custom-solution-field.show {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .plan-selector {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h1>Solicitar Acceso</h1>
+    <p>Nuestro equipo de ventas se comunicará contigo para activar tu suscripción</p>
+    
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+    
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="fullName">Nombre Completo *</label>
+        <input type="text" id="fullName" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Correo Electrónico *</label>
+        <input type="email" id="email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Teléfono</label>
+        <input type="tel" id="phone" />
+      </div>
+
+      <div class="form-group">
+        <label for="company">Empresa</label>
+        <input type="text" id="company" />
+      </div>
+
+      <div class="form-group">
+        <label>Selecciona tu Plan *</label>
+        <div class="plan-selector">
+          <div class="plan-option" data-plan="basico">
+            <input type="radio" name="plan" id="plan-basico" value="basico" required />
+            <label for="plan-basico">
+              <div class="plan-name">Básico</div>
+              <div class="plan-price">$700</div>
+              <div class="plan-period">MXN/año</div>
+            </label>
+          </div>
+          <div class="plan-option" data-plan="profesional">
+            <input type="radio" name="plan" id="plan-profesional" value="profesional" />
+            <label for="plan-profesional">
+              <div class="plan-name">Profesional</div>
+              <div class="plan-price">$1,000</div>
+              <div class="plan-period">MXN/año</div>
+            </label>
+          </div>
+          <div class="plan-option" data-plan="empresarial">
+            <input type="radio" name="plan" id="plan-empresarial" value="empresarial" />
+            <label for="plan-empresarial">
+              <div class="plan-name">Empresarial</div>
+              <div class="plan-price">$1,500</div>
+              <div class="plan-period">MXN/año</div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="requiresInvoice" />
+        <label for="requiresInvoice">Requiero factura (se agregará IVA del 16%)</label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="requiresCustomSolution" />
+        <label for="requiresCustomSolution">Requiero una solución personalizada</label>
+      </div>
+
+      <div class="form-group custom-solution-field" id="customSolutionField">
+        <label for="customSolutionDescription">Describe tu solución personalizada</label>
+        <textarea id="customSolutionDescription" placeholder="Cuéntanos qué necesitas..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="registerBtn">
+        Solicitar Acceso
+      </button>
+    </form>
+
+    <div class="login-link">
+      ¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const registerBtn = document.getElementById('registerBtn');
+    const customSolutionCheckbox = document.getElementById('requiresCustomSolution');
+    const customSolutionField = document.getElementById('customSolutionField');
+
+    // Plan selection handling
+    document.querySelectorAll('.plan-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.plan-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input[type="radio"]').checked = true;
+      });
+    });
+
+    // Custom solution toggle
+    customSolutionCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        customSolutionField.classList.add('show');
+      } else {
+        customSolutionField.classList.remove('show');
+      }
+    });
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+      successMessage.classList.remove('show');
+    }
+
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.classList.add('show');
+      errorMessage.classList.remove('show');
+    }
+
+    function hideMessages() {
+      errorMessage.classList.remove('show');
+      successMessage.classList.remove('show');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessages();
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const company = document.getElementById('company').value.trim();
+      const plan = document.querySelector('input[name="plan"]:checked')?.value;
+      const requiresInvoice = document.getElementById('requiresInvoice').checked;
+      const requiresCustomSolution = document.getElementById('requiresCustomSolution').checked;
+      const customSolutionDescription = document.getElementById('customSolutionDescription').value.trim();
+
+      // Validations
+      if (!fullName) {
+        showError('El nombre completo es requerido');
+        return;
+      }
+
+      if (!email) {
+        showError('El correo electrónico es requerido');
+        return;
+      }
+
+      if (!plan) {
+        showError('Debes seleccionar un plan');
+        return;
+      }
+
+      registerBtn.disabled = true;
+      registerBtn.textContent = 'Procesando...';
+
+      try {
+        const response = await fetch('/api/leads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            fullName, 
+            email, 
+            phone: phone || null, 
+            company: company || null,
+            plan,
+            requiresInvoice,
+            requiresCustomSolution,
+            customSolutionDescription: requiresCustomSolution ? customSolutionDescription : null
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showSuccess('¡Solicitud enviada! Iniciando prueba de 24 horas...');
+          
+          // Store authentication
+          sessionStorage.setItem('authenticated', 'true');
+          sessionStorage.setItem('authToken', data.token);
+          sessionStorage.setItem('username', data.username);
+          sessionStorage.setItem('userId', data.userId);
+          sessionStorage.setItem('trialEnd', data.trialEnd);
+          
+          // Redirect to editor after 2 seconds
+          setTimeout(() => {
+            window.location.href = 'editor.html';
+          }, 2000);
+        } else {
+          showError(data.message || 'Error al procesar la solicitud');
+          registerBtn.disabled = false;
+          registerBtn.textContent = 'Solicitar Acceso';
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        showError('Error de conexión. Por favor intenta de nuevo.');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Solicitar Acceso';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Manager - Crea tu CV Profesional con IA</title>
+  <meta name="description" content="Crea, edita y comparte tu CV profesional en minutos. Optimización con IA, plantillas elegantes y CVs públicos compartibles.">
+  <style>
+    :root {
+      --color-teal-500: rgba(33, 128, 141, 1);
+      --color-teal-600: rgba(29, 116, 128, 1);
+      --color-slate-900: rgba(19, 52, 59, 1);
+      --color-slate-500: rgba(98, 108, 113, 1);
+      --color-cream-50: rgba(252, 252, 249, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--color-slate-900);
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-teal-500);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--color-slate-900);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--color-teal-500);
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: var(--color-teal-500);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-teal-600);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(33, 128, 141, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-slate-900);
+      border: 2px solid var(--color-slate-900);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-slate-900);
+      color: white;
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 70px;
+      padding: 80px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 20px;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-large {
+      padding: 15px 40px;
+      font-size: 16px;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 80px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .features h2 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 60px;
+      color: var(--color-slate-900);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+    }
+
+    .feature-card {
+      text-align: center;
+      padding: 30px;
+      border-radius: 12px;
+      background: #f9f9f9;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: var(--color-slate-900);
+    }
+
+    .feature-card p {
+      color: var(--color-slate-500);
+      line-height: 1.8;
+    }
+
+    /* Pricing Section */
+    .pricing {
+      padding: 80px 20px;
+      background: #f5f5f5;
+    }
+
+    .pricing h2 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 60px;
+      color: var(--color-slate-900);
+    }
+
+    .pricing-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+
+    .pricing-card {
+      background: white;
+      border-radius: 12px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      position: relative;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .pricing-card.featured {
+      border: 3px solid var(--color-teal-500);
+      transform: scale(1.05);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-teal-500);
+      color: white;
+      padding: 5px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pricing-card h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: var(--color-slate-900);
+    }
+
+    .pricing-card .price {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--color-teal-500);
+      margin-bottom: 10px;
+    }
+
+    .pricing-card .price span {
+      font-size: 18px;
+      color: var(--color-slate-500);
+    }
+
+    .pricing-card ul {
+      list-style: none;
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .pricing-card ul li {
+      padding: 10px 0;
+      color: var(--color-slate-500);
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .pricing-card ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--color-teal-500);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .pricing-card ul li.disabled {
+      color: #ccc;
+    }
+
+    .pricing-card ul li.disabled::before {
+      content: "✗";
+      color: #ccc;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--color-slate-900);
+      color: white;
+      padding: 60px 20px 30px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-section h3 {
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 10px;
+    }
+
+    .footer-section a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--color-slate-500);
+      border: none;
+      background: none;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.3s;
+    }
+
+    .modal-close:hover {
+      background: #f0f0f0;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: var(--color-slate-900);
+    }
+
+    .modal-content h3 {
+      margin-top: 30px;
+      margin-bottom: 15px;
+      color: var(--color-slate-900);
+    }
+
+    .modal-content p, .modal-content ul {
+      margin-bottom: 15px;
+      color: var(--color-slate-500);
+      line-height: 1.8;
+    }
+
+    .modal-content ul {
+      padding-left: 25px;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu-btn {
+      display: none;
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-slate-900);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .features h2, .pricing h2 {
+        font-size: 28px;
+      }
+
+      .pricing-card.featured {
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="nav-container">
+      <a href="#" class="logo">📄 CV Manager</a>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="#features">Características</a>
+        <a href="#pricing">Precios</a>
+        <a href="#" onclick="openModal('privacy')">Privacidad</a>
+        <a href="login.html" class="btn btn-secondary">Iniciar Sesión</a>
+        <a href="register.html" class="btn btn-primary">Crear Cuenta Gratis</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Crea tu CV Profesional en Minutos</h1>
+    <p>Editor intuitivo, optimización con IA, plantillas elegantes y CVs compartibles. Todo lo que necesitas para destacar en tu búsqueda laboral.</p>
+    <div class="hero-buttons">
+      <a href="register.html" class="btn btn-primary btn-large">Comenzar Gratis</a>
+      <a href="login.html" class="btn btn-secondary btn-large" style="color: white; border-color: white;">Ya tengo cuenta</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <h2>Todo lo que necesitas para un CV perfecto</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3>Optimización con IA</h3>
+        <p>Asistente inteligente que te ayuda a mejorar cada sección de tu CV con sugerencias profesionales.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Diseño Profesional</h3>
+        <p>Plantilla elegante y moderna que se adapta a cualquier industria. Optimizada para impresión y digital.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <h3>Links Compartibles</h3>
+        <p>Genera un link único para compartir tu CV en línea. Perfecto para aplicaciones y redes sociales.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📸</div>
+        <h3>Foto de Perfil</h3>
+        <p>Añade tu foto profesional para personalizar tu CV y causar mejor impresión.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>100% Responsive</h3>
+        <p>Edita tu CV desde cualquier dispositivo. Se ve perfecto en móvil, tablet y escritorio.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Súper Rápido</h3>
+        <p>Tecnología de vanguardia con Cloudflare Workers. Tu CV se carga instantáneamente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing" id="pricing">
+    <h2>Elige el plan perfecto para ti</h2>
+    <p style="text-align: center; color: var(--color-slate-500); margin-bottom: 30px;">
+      Precios anuales en pesos mexicanos (MXN) • Prueba gratuita de 24 horas
+    </p>
+    <div class="pricing-grid">
+      <!-- Básico Plan -->
+      <div class="pricing-card">
+        <h3>Básico</h3>
+        <div class="price">$700<span>/año</span></div>
+        <ul>
+          <li>1 CV activo</li>
+          <li>Editor completo</li>
+          <li>Vista previa en tiempo real</li>
+          <li>Exportar a PDF</li>
+          <li>Link público básico</li>
+          <li>Asistente IA (10 usos/mes)</li>
+          <li class="disabled">Múltiples CVs</li>
+          <li class="disabled">Foto de perfil</li>
+          <li class="disabled">Soporte prioritario</li>
+        </ul>
+        <a href="register.html" class="btn btn-secondary" style="width: 100%;">Solicitar Acceso</a>
+      </div>
+
+      <!-- Profesional Plan -->
+      <div class="pricing-card featured">
+        <div class="pricing-badge">Más Popular</div>
+        <h3>Profesional</h3>
+        <div class="price">$1,000<span>/año</span></div>
+        <ul>
+          <li>CVs ilimitados</li>
+          <li>Editor completo</li>
+          <li>Vista previa en tiempo real</li>
+          <li>Exportar a PDF</li>
+          <li>Links públicos ilimitados</li>
+          <li>Asistente IA ilimitado</li>
+          <li>Foto de perfil</li>
+          <li>Múltiples versiones de CV</li>
+          <li>Estadísticas de visualización</li>
+        </ul>
+        <a href="register.html" class="btn btn-primary" style="width: 100%;">Solicitar Acceso</a>
+      </div>
+
+      <!-- Empresarial Plan -->
+      <div class="pricing-card">
+        <h3>Empresarial</h3>
+        <div class="price">$1,500<span>/año</span></div>
+        <ul>
+          <li>Todo en Profesional +</li>
+          <li>API de integración</li>
+          <li>Dominio personalizado</li>
+          <li>Soporte prioritario 24/7</li>
+          <li>Gestión de equipo</li>
+          <li>Soluciones personalizadas</li>
+          <li>Analytics avanzados</li>
+          <li>Cumplimiento GDPR</li>
+          <li>Asesoría profesional</li>
+        </ul>
+        <a href="register.html" class="btn btn-secondary" style="width: 100%;">Solicitar Acceso</a>
+      </div>
+    </div>
+    <p style="text-align: center; color: var(--color-slate-500); margin-top: 30px; font-size: 14px;">
+      * Precios no incluyen IVA. El IVA (16%) se agrega únicamente si requiere factura.
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>CV Manager</h3>
+        <p>La forma más rápida y profesional de crear tu currículum vitae.</p>
+      </div>
+      <div class="footer-section">
+        <h3>Producto</h3>
+        <ul>
+          <li><a href="#features">Características</a></li>
+          <li><a href="#pricing">Precios</a></li>
+          <li><a href="register.html">Crear Cuenta</a></li>
+          <li><a href="login.html">Iniciar Sesión</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="#" onclick="openModal('privacy')">Política de Privacidad</a></li>
+          <li><a href="#" onclick="openModal('cookies')">Política de Cookies</a></li>
+          <li><a href="#" onclick="openModal('terms')">Términos y Condiciones</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Soporte</h3>
+        <ul>
+          <li><a href="mailto:soporte@cvmanager.com">soporte@cvmanager.com</a></li>
+          <li><a href="#" onclick="openModal('privacy')">Centro de Ayuda</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 CV Manager. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Privacy Policy Modal -->
+  <div class="modal" id="privacyModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('privacy')">&times;</button>
+      <h2>Política de Privacidad</h2>
+      <p><strong>Última actualización:</strong> 4 de enero de 2025</p>
+      
+      <h3>1. Información que Recopilamos</h3>
+      <p>Recopilamos la siguiente información cuando usas CV Manager:</p>
+      <ul>
+        <li><strong>Información de cuenta:</strong> Usuario, contraseña (encriptada), correo electrónico (opcional)</li>
+        <li><strong>Datos del CV:</strong> Información personal, experiencia laboral, educación, habilidades</li>
+        <li><strong>Imágenes:</strong> Foto de perfil (opcional)</li>
+        <li><strong>Uso del servicio:</strong> Fecha de creación, última actualización, CVs públicos generados</li>
+      </ul>
+
+      <h3>2. Cómo Usamos tu Información</h3>
+      <ul>
+        <li>Proporcionar y mantener nuestro servicio</li>
+        <li>Optimizar tu CV con nuestro asistente de IA</li>
+        <li>Generar links públicos para compartir tu CV</li>
+        <li>Mejorar la experiencia del usuario</li>
+        <li>Enviar notificaciones importantes del servicio</li>
+      </ul>
+
+      <h3>3. Almacenamiento de Datos</h3>
+      <p>Tus datos se almacenan de forma segura en Cloudflare D1 Database con las siguientes medidas:</p>
+      <ul>
+        <li>Contraseñas encriptadas (no almacenamos contraseñas en texto plano)</li>
+        <li>Conexiones HTTPS cifradas</li>
+        <li>Acceso restringido con tokens de sesión</li>
+        <li>Separación de datos por usuario</li>
+      </ul>
+
+      <h3>4. Compartir Información</h3>
+      <p><strong>No vendemos ni compartimos tu información personal con terceros,</strong> excepto:</p>
+      <ul>
+        <li>Cuando creas un CV público (solo la información del CV que elijas hacer público)</li>
+        <li>Con tu consentimiento explícito</li>
+        <li>Por requerimiento legal</li>
+      </ul>
+
+      <h3>5. Uso de IA</h3>
+      <p>Utilizamos Blackbox AI para optimizar el contenido de tu CV. Los datos enviados a la IA son:</p>
+      <ul>
+        <li>Información mínima necesaria para el contexto</li>
+        <li>No se almacenan permanentemente por el servicio de IA</li>
+        <li>Se procesan de forma segura y confidencial</li>
+      </ul>
+
+      <h3>6. Tus Derechos</h3>
+      <p>Tienes derecho a:</p>
+      <ul>
+        <li>Acceder a tu información personal</li>
+        <li>Corregir datos inexactos</li>
+        <li>Eliminar tu cuenta y todos tus datos</li>
+        <li>Exportar tus datos en formato PDF</li>
+        <li>Revocar consentimientos otorgados</li>
+      </ul>
+
+      <h3>7. Retención de Datos</h3>
+      <p>Conservamos tu información mientras tu cuenta esté activa. Al eliminar tu cuenta, todos tus datos se borran permanentemente en un plazo de 30 días.</p>
+
+      <h3>8. Contacto</h3>
+      <p>Para consultas sobre privacidad: <a href="mailto:privacidad@cvmanager.com">privacidad@cvmanager.com</a></p>
+    </div>
+  </div>
+
+  <!-- Cookies Policy Modal -->
+  <div class="modal" id="cookiesModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('cookies')">&times;</button>
+      <h2>Política de Cookies</h2>
+      <p><strong>Última actualización:</strong> 4 de enero de 2025</p>
+      
+      <h3>1. ¿Qué son las Cookies?</h3>
+      <p>Las cookies son pequeños archivos de texto que se almacenan en tu navegador cuando visitas nuestro sitio web. Nos ayudan a proporcionar una mejor experiencia.</p>
+
+      <h3>2. Cookies que Utilizamos</h3>
+      
+      <h4>Cookies Esenciales (Necesarias)</h4>
+      <ul>
+        <li><strong>sessionStorage:</strong> Mantiene tu sesión activa mientras usas la aplicación</li>
+        <li><strong>authToken:</strong> Token de autenticación para acceder a tu cuenta</li>
+        <li><strong>userId:</strong> Identificador de tu cuenta de usuario</li>
+      </ul>
+      <p><em>Estas cookies son necesarias para el funcionamiento del servicio y no se pueden desactivar.</em></p>
+
+      <h4>Cookies de Funcionalidad</h4>
+      <ul>
+        <li><strong>localStorage (CVs):</strong> Fallback offline de tus CVs</li>
+        <li><strong>previewCV:</strong> Datos temporales para vista previa</li>
+      </ul>
+
+      <h3>3. Cookies de Terceros</h3>
+      <p>Utilizamos servicios de terceros que pueden establecer sus propias cookies:</p>
+      <ul>
+        <li><strong>Blackbox AI:</strong> Para el asistente de inteligencia artificial</li>
+        <li><strong>Cloudflare:</strong> Para seguridad y rendimiento del sitio</li>
+      </ul>
+
+      <h3>4. Gestión de Cookies</h3>
+      <p>Puedes gestionar las cookies desde la configuración de tu navegador:</p>
+      <ul>
+        <li>Bloquear todas las cookies</li>
+        <li>Eliminar cookies existentes</li>
+        <li>Permitir cookies solo de sitios específicos</li>
+      </ul>
+      <p><strong>Nota:</strong> Bloquear cookies esenciales impedirá el uso de CV Manager.</p>
+
+      <h3>5. Duración de las Cookies</h3>
+      <ul>
+        <li><strong>Sesión:</strong> Se eliminan al cerrar el navegador (sessionStorage)</li>
+        <li><strong>Persistentes:</strong> Se mantienen hasta que las elimines manualmente (localStorage)</li>
+      </ul>
+
+      <h3>6. Actualizaciones</h3>
+      <p>Podemos actualizar esta política. Te notificaremos sobre cambios significativos mediante un aviso en el sitio.</p>
+
+      <h3>7. Contacto</h3>
+      <p>Para consultas sobre cookies: <a href="mailto:soporte@cvmanager.com">soporte@cvmanager.com</a></p>
+    </div>
+  </div>
+
+  <!-- Terms and Conditions Modal -->
+  <div class="modal" id="termsModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('terms')">&times;</button>
+      <h2>Términos y Condiciones de Uso</h2>
+      <p><strong>Última actualización:</strong> 4 de enero de 2025</p>
+      
+      <h3>1. Aceptación de los Términos</h3>
+      <p>Al acceder y usar CV Manager, aceptas estar sujeto a estos Términos y Condiciones. Si no estás de acuerdo, por favor no uses el servicio.</p>
+
+      <h3>2. Descripción del Servicio</h3>
+      <p>CV Manager es una plataforma web que permite crear, editar y compartir currículums vitae profesionales con las siguientes características:</p>
+      <ul>
+        <li>Editor de CV interactivo</li>
+        <li>Optimización con asistente de IA</li>
+        <li>Generación de CVs públicos compartibles</li>
+        <li>Almacenamiento seguro en la nube</li>
+      </ul>
+
+      <h3>3. Registro y Cuenta</h3>
+      <ul>
+        <li>Debes proporcionar información precisa y actualizada</li>
+        <li>Eres responsable de mantener la confidencialidad de tu contraseña</li>
+        <li>Debes tener al menos 16 años para usar el servicio</li>
+        <li>Una persona o entidad solo puede tener una cuenta activa</li>
+        <li>No puedes transferir tu cuenta a terceros</li>
+      </ul>
+
+      <h3>4. Planes y Pagos</h3>
+      <h4>Plan Gratuito</h4>
+      <ul>
+        <li>1 CV activo</li>
+        <li>Funcionalidad básica</li>
+        <li>5 usos del asistente IA por mes</li>
+      </ul>
+
+      <h4>Plan Pro ($179 MXN/mes)</h4>
+      <ul>
+        <li>CVs ilimitados</li>
+        <li>Asistente IA ilimitado</li>
+        <li>Todas las características premium</li>
+        <li>Facturación mensual automática</li>
+        <li>Cancela cuando quieras</li>
+      </ul>
+
+      <h4>Plan Enterprise ($579 MXN/mes)</h4>
+      <ul>
+        <li>Todo lo incluido en Pro</li>
+        <li>API de integración</li>
+        <li>Soporte prioritario</li>
+        <li>Personalización avanzada</li>
+      </ul>
+
+      <h3>5. Uso Aceptable</h3>
+      <p><strong>No está permitido:</strong></p>
+      <ul>
+        <li>Usar el servicio para fines ilegales</li>
+        <li>Subir contenido ofensivo, discriminatorio o difamatorio</li>
+        <li>Intentar acceder a cuentas de otros usuarios</li>
+        <li>Realizar ingeniería inversa del código</li>
+        <li>Usar bots o automatización no autorizada</li>
+        <li>Revender o redistribuir el servicio</li>
+      </ul>
+
+      <h3>6. Propiedad Intelectual</h3>
+      <ul>
+        <li><strong>Tu contenido:</strong> Mantienes todos los derechos sobre el contenido de tu CV</li>
+        <li><strong>Nuestro servicio:</strong> El código, diseño y marca de CV Manager son de nuestra propiedad</li>
+        <li><strong>Licencia de uso:</strong> Te otorgamos una licencia limitada, no exclusiva y revocable para usar el servicio</li>
+      </ul>
+
+      <h3>7. CVs Públicos</h3>
+      <p>Al hacer un CV público:</p>
+      <ul>
+        <li>Aceptas que cualquier persona con el link pueda verlo</li>
+        <li>El CV estará disponible indefinidamente hasta que lo desactives</li>
+        <li>Eres responsable de la información que compartes</li>
+        <li>Puedes desactivar la visibilidad pública en cualquier momento</li>
+      </ul>
+
+      <h3>8. Cancelación y Reembolsos</h3>
+      <ul>
+        <li>Puedes cancelar tu suscripción en cualquier momento</li>
+        <li>El acceso a funciones Pro continúa hasta el final del período pagado</li>
+        <li>No ofrecemos reembolsos por períodos parciales</li>
+        <li>Podemos suspender o terminar cuentas que violen estos términos</li>
+      </ul>
+
+      <h3>9. Limitación de Responsabilidad</h3>
+      <p>CV Manager se proporciona "tal cual" sin garantías de ningún tipo. No somos responsables de:</p>
+      <ul>
+        <li>Pérdida de datos (aunque hacemos backups regulares)</li>
+        <li>Decisiones de contratación basadas en CVs creados en la plataforma</li>
+        <li>Interrupciones del servicio</li>
+        <li>Daños indirectos o consecuentes</li>
+      </ul>
+
+      <h3>10. Modificaciones del Servicio</h3>
+      <p>Nos reservamos el derecho de:</p>
+      <ul>
+        <li>Modificar o discontinuar características</li>
+        <li>Cambiar precios con 30 días de aviso</li>
+        <li>Actualizar estos términos (notificaremos cambios importantes)</li>
+      </ul>
+
+      <h3>11. Ley Aplicable</h3>
+      <p>Estos términos se rigen por las leyes de México. Cualquier disputa será resuelta en los tribunales de Ciudad de México.</p>
+
+      <h3>12. Contacto</h3>
+      <p>Para consultas sobre estos términos: <a href="mailto:legal@cvmanager.com">legal@cvmanager.com</a></p>
+    </div>
+  </div>
+
+  <script>
+    function toggleMobileMenu() {
+      document.getElementById('navLinks').classList.toggle('active');
+    }
+
+    function openModal(type) {
+      const modalIds = {
+        'privacy': 'privacyModal',
+        'cookies': 'cookiesModal',
+        'terms': 'termsModal'
+      };
+      const modal = document.getElementById(modalIds[type]);
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeModal(type) {
+      const modalIds = {
+        'privacy': 'privacyModal',
+        'cookies': 'cookiesModal',
+        'terms': 'termsModal'
+      };
+      const modal = document.getElementById(modalIds[type]);
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#' && !this.getAttribute('onclick')) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
