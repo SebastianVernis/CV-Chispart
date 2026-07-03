@@ -1,35 +1,26 @@
 /**
- * AI Providers Module - Blackbox AI only
+ * AI Providers Module - Open AI Compatible
  */
 
 const AI_PROVIDERS = {
-  BLACKBOX: 'blackbox',
-};
-
-const AI_MODELS = {
-  [AI_PROVIDERS.BLACKBOX]: {
-    'gpt-4o': 'blackboxai/openai/gpt-4o',
-    'claude-sonnet': 'blackboxai/anthropic/claude-sonnet-3.5',
-    'gemini-pro': 'blackboxai/google/gemini-pro',
-    'llama-3.1-70b': 'blackboxai/meta/llama-3.1-70b',
-    'mixtral-8x7b': 'blackboxai/mistralai/mixtral-8x7b',
-  },
+  OPENAI_COMPATIBLE: 'openai_compatible',
 };
 
 const SYSTEM_PROMPT = 'Eres un experto en recursos humanos y redacción de CVs profesionales. Ayudas a optimizar CVs para que sean más efectivos y atractivos para reclutadores. Responde en español de forma clara y concisa.';
 
 /**
- * Call Blackbox AI API
+ * Call Open AI Compatible API
  */
-async function callBlackbox(apiKey, model, prompt, cvData) {
-  const response = await fetch('https://api.blackbox.ai/chat/completions', {
+async function callOpenAICompatible(apiKey, baseUrl, model, prompt, cvData) {
+  const url = `${baseUrl.replace(/\/$/, '')}/v1/chat/completions`;
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: model || 'blackboxai/openai/gpt-4o',
+      model: model,
       messages: [
         {
           role: 'system',
@@ -48,64 +39,68 @@ async function callBlackbox(apiKey, model, prompt, cvData) {
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Blackbox API error (${response.status}): ${error}`);
+    throw new Error(`AI API error (${response.status}): ${error}`);
   }
 
   const data = await response.json();
   return {
-    provider: AI_PROVIDERS.BLACKBOX,
-    model: model || 'blackboxai/openai/gpt-4o',
+    provider: AI_PROVIDERS.OPENAI_COMPATIBLE,
+    model: model,
     suggestion: data.choices[0].message.content,
     usage: data.usage,
   };
 }
 
 /**
- * Main function to optimize CV with AI (Blackbox only)
+ * Main function to optimize CV with AI
  * @param {Object} options - Configuration options
- * @param {string} options.model - Model to use (optional)
+ * @param {string} options.model - Model to use
  * @param {string} options.prompt - User prompt
  * @param {Object} options.cvData - CV data
- * @param {Object} options.apiKeys - API keys for providers
+ * @param {Object} options.apiConfig - API configuration containing key and baseUrl
  * @returns {Promise<Object>} AI response
  */
 export async function optimizeWithAI(options) {
-  const { model, prompt, cvData, apiKeys } = options;
+  const { model, prompt, cvData, apiConfig } = options;
 
   if (!prompt || !cvData) {
     throw new Error('Prompt and CV data are required');
   }
 
-  if (!apiKeys.blackbox) {
-    throw new Error('Blackbox API key not configured');
+  if (!apiConfig || !apiConfig.apiKey || !apiConfig.baseUrl) {
+    throw new Error('AI API key or base URL not configured');
+  }
+
+  if (!model) {
+    throw new Error('Model is required');
   }
 
   try {
-    return await callBlackbox(apiKeys.blackbox, model, prompt, cvData);
+    return await callOpenAICompatible(apiConfig.apiKey, apiConfig.baseUrl, model, prompt, cvData);
   } catch (error) {
-    console.error('Error calling Blackbox:', error);
+    console.error('Error calling AI API:', error);
     throw error;
   }
 }
 
 /**
- * Compare responses from multiple models (all through Blackbox)
+ * Compare responses from multiple models
  * @param {Object} options - Configuration options
  * @param {Array<string>} options.models - List of models to compare
  * @param {string} options.prompt - User prompt
  * @param {Object} options.cvData - CV data
- * @param {Object} options.apiKeys - API keys
+ * @param {Object} options.apiConfig - API configuration containing key and baseUrl
  * @returns {Promise<Array>} Array of AI responses
  */
 export async function compareProviders(options) {
-  const { models, prompt, cvData, apiKeys } = options;
+  const { models, prompt, cvData, apiConfig } = options;
 
   if (!models || models.length === 0) {
     throw new Error('At least one model is required');
   }
 
-  if (!apiKeys.blackbox) {
-    throw new Error('Blackbox API key not configured');
+  if (!apiConfig || !apiConfig.apiKey || !apiConfig.baseUrl) {
+    throw new Error('AI API key or base URL not configured');
   }
 
   const results = await Promise.allSettled(
@@ -115,7 +110,7 @@ export async function compareProviders(options) {
         model,
         prompt,
         cvData,
-        apiKeys,
+        apiConfig,
       }).then(result => ({
         ...result,
         responseTime: Date.now() - startTime,
@@ -140,20 +135,43 @@ export async function compareProviders(options) {
 }
 
 /**
- * Get available models based on configured API keys
+ * Get available models dynamically from the v1/models endpoint
  */
-export function getAvailableProviders(apiKeys) {
-  if (!apiKeys.blackbox) {
+export async function getAvailableProviders(apiConfig) {
+  if (!apiConfig || !apiConfig.apiKey || !apiConfig.baseUrl) {
     return [];
   }
 
-  return [
-    { id: 'blackboxai/openai/gpt-4o', name: 'GPT-4o (via Blackbox)', default: true },
-    { id: 'blackboxai/anthropic/claude-sonnet-3.5', name: 'Claude Sonnet 3.5 (via Blackbox)', default: false },
-    { id: 'blackboxai/google/gemini-pro', name: 'Gemini Pro (via Blackbox)', default: false },
-    { id: 'blackboxai/meta/llama-3.1-70b', name: 'Llama 3.1 70B (via Blackbox)', default: false },
-    { id: 'blackboxai/mistralai/mixtral-8x7b', name: 'Mixtral 8x7B (via Blackbox)', default: false },
-  ];
+  try {
+    const url = `${apiConfig.baseUrl.replace(/\/$/, '')}/v1/models`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiConfig.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch models: ${response.status} ${response.statusText}`);
+      return [];
+    }
+
+    const data = await response.json();
+    if (!data || !data.data || !Array.isArray(data.data)) {
+      console.error('Invalid models response format');
+      return [];
+    }
+
+    return data.data.map((model, index) => ({
+      id: model.id,
+      name: model.id,
+      default: index === 0, // First model is default
+    }));
+  } catch (error) {
+    console.error('Error fetching available models:', error);
+    return [];
+  }
 }
 
-export { AI_PROVIDERS, AI_MODELS };
+export { AI_PROVIDERS };
