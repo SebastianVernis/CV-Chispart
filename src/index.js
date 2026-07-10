@@ -46,11 +46,12 @@ async function handleAPI(request, env, corsHeaders) {
         });
       }
 
-      const apiKeys = {
-        blackbox: env.BLACKBOX_API_KEY,
+      const apiConfig = {
+        apiKey: env.AI_API_KEY,
+        baseUrl: env.AI_BASE_URL,
       };
 
-      const availableProviders = getAvailableProviders(apiKeys);
+      const availableProviders = await getAvailableProviders(apiConfig);
 
       return new Response(JSON.stringify({ 
         success: true,
@@ -82,16 +83,26 @@ async function handleAPI(request, env, corsHeaders) {
         });
       }
 
+      if (!model) {
+        return new Response(JSON.stringify({
+          error: 'El modelo es requerido'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       try {
-        const apiKeys = {
-          blackbox: env.BLACKBOX_API_KEY,
+        const apiConfig = {
+          apiKey: env.AI_API_KEY,
+          baseUrl: env.AI_BASE_URL,
         };
 
         const result = await optimizeWithAI({
-          model: model || 'blackboxai/openai/gpt-4o',
+          model: model,
           prompt,
           cvData,
-          apiKeys,
+          apiConfig,
         });
 
         return new Response(JSON.stringify({ 
@@ -133,16 +144,26 @@ async function handleAPI(request, env, corsHeaders) {
         });
       }
 
+      if (!models || models.length === 0) {
+        return new Response(JSON.stringify({
+          error: 'Se requiere al menos un modelo para comparar'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       try {
-        const apiKeys = {
-          blackbox: env.BLACKBOX_API_KEY,
+        const apiConfig = {
+          apiKey: env.AI_API_KEY,
+          baseUrl: env.AI_BASE_URL,
         };
 
         const results = await compareProviders({
           models,
           prompt,
           cvData,
-          apiKeys,
+          apiConfig,
         });
 
         return new Response(JSON.stringify({ 

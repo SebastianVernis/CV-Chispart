@@ -232,13 +232,11 @@ describe('API Endpoints Structure', () => {
       it('should validate response structure', () => {
         const response = {
           success: true,
-          providers: ['openai', 'anthropic', 'gemini', 'blackbox'],
-          default: 'blackbox'
+          providers: [{ id: 'mock-model', name: 'mock-model', default: true }]
         };
         
         expect(response.success).toBe(true);
         expect(Array.isArray(response.providers)).toBe(true);
-        expect(response).toHaveProperty('default');
       });
     });
 
@@ -250,16 +248,15 @@ describe('API Endpoints Structure', () => {
             name: 'John Doe',
             role: 'Developer'
           },
-          provider: 'openai',
-          model: 'gpt-4'
+          model: 'mock-model'
         };
         
         expect(validRequest).toHaveProperty('prompt');
         expect(validRequest).toHaveProperty('cvData');
-        expect(validRequest.provider).toBeDefined();
+        expect(validRequest.model).toBeDefined();
       });
 
-      it('should allow optional provider and model', () => {
+      it('should allow optional model', () => {
         const minimalRequest = {
           prompt: 'Optimize my CV',
           cvData: { name: 'Test' }
@@ -272,8 +269,8 @@ describe('API Endpoints Structure', () => {
       it('should validate success response structure', () => {
         const successResponse = {
           success: true,
-          provider: 'openai',
-          model: 'gpt-4',
+          provider: 'openai_compatible',
+          model: 'mock-model',
           suggestion: 'Optimized content here...',
           usage: {
             prompt_tokens: 100,
@@ -292,13 +289,13 @@ describe('API Endpoints Structure', () => {
         const validRequest = {
           prompt: 'Optimize my CV',
           cvData: { name: 'Test' },
-          providers: ['openai', 'anthropic', 'gemini']
+          models: ['mock-model-1', 'mock-model-2']
         };
         
         expect(validRequest).toHaveProperty('prompt');
         expect(validRequest).toHaveProperty('cvData');
-        expect(Array.isArray(validRequest.providers)).toBe(true);
-        expect(validRequest.providers.length).toBeGreaterThan(0);
+        expect(Array.isArray(validRequest.models)).toBe(true);
+        expect(validRequest.models.length).toBeGreaterThan(0);
       });
 
       it('should validate success response structure', () => {
@@ -307,12 +304,14 @@ describe('API Endpoints Structure', () => {
           results: [
             {
               success: true,
-              provider: 'openai',
+              provider: 'openai_compatible',
+              model: 'mock-model-1',
               suggestion: 'OpenAI response'
             },
             {
               success: false,
-              provider: 'anthropic',
+              provider: 'openai_compatible',
+              model: 'mock-model-2',
               error: 'API key not configured'
             }
           ]
